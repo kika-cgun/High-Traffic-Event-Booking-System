@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
     private final ReservationService reservationService;
 
-    @Operation(summary = "Make a reservation for a seat", description = "Trying reserve selected seat for use. Using Redis and Optimistic Locking.")
+    @Operation(summary = "Make a reservation for a seat", description = "Attempts to reserve the selected seat for the user. Supports Redis locks and Optimistic Locking.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reservation successful"),
             @ApiResponse(responseCode = "409", description = "Seat is already reserved"),
