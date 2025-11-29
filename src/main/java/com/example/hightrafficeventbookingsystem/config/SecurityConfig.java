@@ -47,14 +47,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Wyłączamy CSRF (niepotrzebne w REST API bez sesji przeglądarkowej)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // 2. Konfiguracja uprawnień
+                // SWAGGER UI access
                 .authorizeHttpRequests(auth -> auth
-                        // Pozwalamy każdemu uderzyć do endpointów rezerwacji
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/api/reservations/**"
+                        ).permitAll()
+                        // Other endpoints require authentication
                         .requestMatchers("/api/reservations/**").permitAll()
-                        // Wszystko inne wymagałoby autoryzacji (na przyszłość)
+                        // Require authentication for all other requests
                         .anyRequest().authenticated()
                 );
 

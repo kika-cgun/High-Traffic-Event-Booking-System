@@ -45,8 +45,7 @@ class ReservationConcurrencyTest {
     @ServiceConnection
     static RabbitMQContainer rabbit = new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
 
-    // 3. REDIS (Dodany brakujący element!)
-    // Używamy GenericContainer, bo Redis nie ma dedykowanej klasy w podstawowym pakiecie
+    // 3. REDIS
     @Container
     static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:alpine"))
             .withExposedPorts(6379);
@@ -80,7 +79,7 @@ class ReservationConcurrencyTest {
 
         // Tworzymy Event
         Event event = new Event();
-        event.setName("Koncert Testowy");
+        event.setName("Test Event");
         event.setDate(LocalDateTime.now().plusDays(10));
         eventRepository.save(event);
 
@@ -96,13 +95,12 @@ class ReservationConcurrencyTest {
         Seat savedSeat = seatRepository.save(seat);
         seatId = savedSeat.getId();
 
-        // NAPRAWA BŁĘDU: Tworzymy 10 użytkowników w bazie!
-        // Bez tego baza rzuci błąd klucza obcego (Foreign Key Violation)
+        // Tworzymy 10 użytkowników
         for (int i = 0; i < 10; i++) {
             User user = new User();
             user.setEmail("user" + i + "@test.com");
             user.setUsername("user" + i);
-            user.setName("Jan"); // Wymagane pola jeśli masz walidację
+            user.setName("Jan");
             // user.setPassword(...) // jeśli wymagane
             // user.setRole(Role.USER); // jeśli wymagane
             user = userRepository.save(user);
@@ -120,7 +118,7 @@ class ReservationConcurrencyTest {
         AtomicInteger failCount = new AtomicInteger(0);
 
         for (int i = 0; i < threadCount; i++) {
-            final Long userId = userIds.get(i); // Pobieramy prawdziwe ID z bazy
+            final Long userId = userIds.get(i);
 
             executorService.submit(() -> {
                 try {
@@ -131,8 +129,6 @@ class ReservationConcurrencyTest {
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {
-                    // Wyświetlmy błąd w konsoli, żeby wiedzieć co się stało, jeśli test znów nie przejdzie
-                    // System.out.println("Błąd rezerwacji: " + e.getMessage());
                     e.printStackTrace();
                     failCount.incrementAndGet();
                 }
@@ -141,11 +137,11 @@ class ReservationConcurrencyTest {
 
         Thread.sleep(2000);
 
-        System.out.println("Udane rezerwacje: " + successCount.get());
-        System.out.println("Odrzucone rezerwacje: " + failCount.get());
+        System.out.println("Successful reservations: " + successCount.get());
+        System.out.println("Cancelled reservations: " + failCount.get());
 
         // Asercja
-        assertEquals(1, successCount.get(), "Tylko jedna rezerwacja powinna się udać!");
-        assertEquals(threadCount - 1, failCount.get(), "Reszta powinna zostać odrzucona.");
+        assertEquals(1, successCount.get(), "Just one reservation should succeed.");
+        assertEquals(threadCount - 1, failCount.get(), "The rest should fail.");
     }
 }
