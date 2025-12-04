@@ -29,9 +29,9 @@ public class ReservationCleanupService {
         log.info("Checking for expired reservations to clean up...");
 
         //For testing
-        LocalDateTime cutoffDateTime = LocalDateTime.now().minusSeconds(15);
+        //LocalDateTime cutoffDateTime = LocalDateTime.now().minusSeconds(15);
 
-        //LocalDateTime cutoffDateTime = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime cutoffDateTime = LocalDateTime.now().minusMinutes(15);
 
         List<Ticket> expiredTickets = ticketRepository.findByStatusAndCreatedAtBefore(Status.RESERVED, cutoffDateTime);
 
