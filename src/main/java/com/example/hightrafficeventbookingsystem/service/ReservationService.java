@@ -55,9 +55,8 @@ public class ReservationService {
             notificationProducer.sendTicketNotification(event);
 
             return ticket.getId();
-        } catch (Exception e) {
+        } finally {
             redisLockService.releaseLock(seatId);
-            throw e;
         }
     }
 }
