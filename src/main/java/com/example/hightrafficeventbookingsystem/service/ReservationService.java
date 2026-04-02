@@ -32,7 +32,7 @@ public class ReservationService {
 
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new IllegalArgumentException("Seat not found"));
+            Seat seat = seatRepository.findByIdWithEvent(seatId).orElseThrow(() -> new IllegalArgumentException("Seat not found"));
 
             if (seat.isReserved()) {
                 throw new IllegalStateException("Seat is already reserved");
