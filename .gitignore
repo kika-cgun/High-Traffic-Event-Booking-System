@@ -33,3 +33,6 @@ build/
 .vscode/
 
 .DS_Store
+
+# Environment secrets — never commit the real file
+.env
