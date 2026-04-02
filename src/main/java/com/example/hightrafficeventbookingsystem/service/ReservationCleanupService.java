@@ -7,6 +7,7 @@ import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,8 @@ import java.util.List;
 @Slf4j
 public class ReservationCleanupService {
 
+    private static final int BATCH_SIZE = 500;
+
     private final TicketRepository ticketRepository;
     private final SeatRepository seatRepository;
     private final RedisLockService redisLockService;
@@ -28,24 +31,23 @@ public class ReservationCleanupService {
     public void cleanup() {
         log.info("Checking for expired reservations to clean up...");
 
-        //For testing
-        //LocalDateTime cutoffDateTime = LocalDateTime.now().minusSeconds(15);
-
         LocalDateTime cutoffDateTime = LocalDateTime.now().minusMinutes(15);
 
-        List<Ticket> expiredTickets = ticketRepository.findByStatusAndCreatedAtBefore(Status.RESERVED, cutoffDateTime);
+        // JOIN FETCH avoids N+1; PageRequest caps batch size to prevent OOM
+        List<Ticket> expiredTickets = ticketRepository.findExpiredWithSeat(
+                Status.RESERVED, cutoffDateTime, PageRequest.of(0, BATCH_SIZE));
 
-        if(expiredTickets.isEmpty()) {
+        if (expiredTickets.isEmpty()) {
             log.info("No expired reservations found.");
             return;
         }
 
         log.info("Found {} expired reservations. Cleaning up...", expiredTickets.size());
 
-        for(Ticket ticket : expiredTickets) {
+        for (Ticket ticket : expiredTickets) {
             ticket.setStatus(Status.CANCELLED);
 
-            Seat seat = ticket.getSeat();
+            Seat seat = ticket.getSeat(); // already fetched via JOIN FETCH — no extra query
             seat.setReserved(false);
             seatRepository.save(seat);
 
