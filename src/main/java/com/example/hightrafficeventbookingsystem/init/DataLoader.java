@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.json.JsonMapper;
+
 
 import java.time.LocalDateTime;
 
@@ -38,8 +38,7 @@ public class DataLoader implements CommandLineRunner {
             user.setEmail("email@example.com");
             user.setRole(Role.USER);
             userRepository.save(user);
-            log.info("Default user created." +
-                    " Username: user, Password: password");
+            log.info("Default user created with username: user");
         } else {
             log.info("Users already exist in the database. Skipping data initialization.");
         }
