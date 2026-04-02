@@ -211,7 +211,7 @@ On `/events/:id`, clicking an available seat:
 - Red = reserved (disabled)
 - Colors update live via WebSocket without page refresh
 
-**`/checkout/:ticketId`** — Event name, seat number, price (mock). "Pay now" button → `MatProgressSpinner` for 2s → `POST /api/tickets/:id/confirm` → success screen with ticket ID.
+**`/checkout/:ticketId`** — Event name, seat number, price hardcoded as "50 PLN" (Seat/Event entities have no price field — out of scope). "Pay now" button → `MatProgressSpinner` for 2s → `POST /api/tickets/:id/confirm` → success screen with ticket ID.
 
 **`/tickets`** — List of user's tickets with `MatChip` status badge (RESERVED=orange, CONFIRMED=green, CANCELLED=grey). Cancel button on RESERVED tickets.
 
