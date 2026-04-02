@@ -1,5 +1,6 @@
 package com.example.hightrafficeventbookingsystem.service;
 
+import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
 import com.example.hightrafficeventbookingsystem.dto.TicketCreatedEvent;
 import com.example.hightrafficeventbookingsystem.model.Seat;
 import com.example.hightrafficeventbookingsystem.model.Status;
@@ -9,9 +10,10 @@ import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.repository.TicketRepository;
 import com.example.hightrafficeventbookingsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final RedisLockService redisLockService;
     private final NotificationProducer notificationProducer;
+    private final ReservationEventProducer reservationEventProducer;
 
     @Transactional
     public Long reserveSeat(Long seatId, Long userId) {
@@ -47,12 +50,23 @@ public class ReservationService {
             ticket.setStatus(Status.RESERVED);
             ticketRepository.save(ticket);
 
-            TicketCreatedEvent event = new TicketCreatedEvent(
+            // RabbitMQ — szybkie powiadomienie: generowanie PDF + email
+            TicketCreatedEvent rabbitEvent = new TicketCreatedEvent(
                     ticket.getId(),
                     user.getEmail()
             );
+            notificationProducer.sendTicketNotification(rabbitEvent);
 
-            notificationProducer.sendTicketNotification(event);
+            // Kafka — audit log: pełna historia zmian stanu rezerwacji
+            ReservationEvent kafkaEvent = new ReservationEvent(
+                    ticket.getId(),
+                    user.getId(),
+                    seat.getId(),
+                    seat.getEvent().getName(),
+                    ReservationEvent.ReservationAction.RESERVED,
+                    Instant.now()
+            );
+            reservationEventProducer.publish(kafkaEvent);
 
             return ticket.getId();
         } finally {

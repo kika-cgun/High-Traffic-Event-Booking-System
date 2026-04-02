@@ -31,6 +31,16 @@ spring:
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
 
+  # Konfiguracja Kafka
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      # Retry przy przejściowych błędach sieci
+      retries: 3
+    consumer:
+      # Czytaj od początku przy pierwszym starcie consumer group
+      auto-offset-reset: earliest
+
 # Konfiguracja JWT
 security:
   jwt:
