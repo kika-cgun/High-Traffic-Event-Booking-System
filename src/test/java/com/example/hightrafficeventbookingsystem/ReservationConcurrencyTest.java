@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Testcontainers
@@ -135,12 +137,13 @@ class ReservationConcurrencyTest {
             });
         }
 
-        Thread.sleep(2000);
+        executorService.shutdown();
+        boolean finished = executorService.awaitTermination(10, TimeUnit.SECONDS);
 
         System.out.println("Successful reservations: " + successCount.get());
-        System.out.println("Cancelled reservations: " + failCount.get());
+        System.out.println("Failed reservations: " + failCount.get());
 
-        // Asercja
+        assertTrue(finished, "Executor did not finish within the timeout");
         assertEquals(1, successCount.get(), "Just one reservation should succeed.");
         assertEquals(threadCount - 1, failCount.get(), "The rest should fail.");
     }
