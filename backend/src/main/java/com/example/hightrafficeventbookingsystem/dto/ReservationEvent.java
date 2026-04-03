@@ -10,6 +10,7 @@ public record ReservationEvent(
         Long ticketId,
         Long userId,
         Long seatId,
+        Long eventId,
         String eventName,
         ReservationAction action,
         Instant timestamp

@@ -62,6 +62,7 @@ public class ReservationService {
                     ticket.getId(),
                     user.getId(),
                     seat.getId(),
+                    seat.getEvent().getId(),
                     seat.getEvent().getName(),
                     ReservationEvent.ReservationAction.RESERVED,
                     Instant.now()
