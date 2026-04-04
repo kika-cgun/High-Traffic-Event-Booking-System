@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class ReservationAuditConsumer {
 
     private final AuditLogRepository auditLogRepository;
+    private final SeatWebSocketService seatWebSocketService;
 
     @KafkaListener(
             topics = KafkaConfig.RESERVATION_EVENTS_TOPIC,
@@ -40,5 +41,6 @@ public class ReservationAuditConsumer {
         );
 
         auditLogRepository.save(new AuditLog(event));
+        seatWebSocketService.broadcastSeatUpdate(event);
     }
 }
