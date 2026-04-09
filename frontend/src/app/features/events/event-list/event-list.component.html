@@ -1,0 +1,53 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>Events</h1>
+    <p class="subtitle">Pick an event and grab your seat before it's gone.</p>
+  </header>
+
+  @if (loading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (page()) {
+    <div class="event-grid">
+      @for (event of page()!.content; track event.id) {
+        <mat-card class="event-card" (click)="openEvent(event.id)">
+          <mat-card-header>
+            <mat-card-title>{{ event.name }}</mat-card-title>
+            <mat-card-subtitle>
+              <mat-icon inline>calendar_today</mat-icon>
+              {{ event.date | date:'d MMM y, HH:mm' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="seat-badge">
+              @if (event.availableSeats > 0) {
+                <mat-chip highlighted>
+                  {{ event.availableSeats }} seats left
+                </mat-chip>
+              } @else {
+                <mat-chip disabled>Sold out</mat-chip>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary" [disabled]="event.availableSeats === 0">
+              <mat-icon>arrow_forward</mat-icon>
+              View seats
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="page()!.totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex()"
+      [hidePageSize]="true"
+      (page)="onPageChange($event)"
+    />
+  }
+</div>
