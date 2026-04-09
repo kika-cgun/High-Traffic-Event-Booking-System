@@ -2,6 +2,9 @@ package com.example.hightrafficeventbookingsystem.service;
 
 import com.example.hightrafficeventbookingsystem.config.KafkaConfig;
 import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
+import com.example.hightrafficeventbookingsystem.model.AuditLog;
+import com.example.hightrafficeventbookingsystem.repository.AuditLogRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -11,17 +14,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ReservationAuditConsumer {
 
-    /**
-     * Konsumuje wszystkie eventy rezerwacji z topiku Kafki.
-     *
-     * Pełni rolę audit logu — każda zmiana stanu biletu (RESERVED / CONFIRMED / CANCELLED)
-     * jest tutaj trwale rejestrowana. W przyszłości można podłączyć tu:
-     *   - zapis do tabeli audit_log w PostgreSQL
-     *   - wysyłkę do ElasticSearch / Kibana
-     *   - liczniki statystyk / Prometheus metrics
-     */
+    private final AuditLogRepository auditLogRepository;
+    private final SeatWebSocketService seatWebSocketService;
+
     @KafkaListener(
             topics = KafkaConfig.RESERVATION_EVENTS_TOPIC,
             groupId = KafkaConfig.AUDIT_CONSUMER_GROUP,
@@ -42,6 +40,7 @@ public class ReservationAuditConsumer {
                 event.timestamp()
         );
 
-        // TODO: Persist to audit_log table or forward to analytics pipeline
+        auditLogRepository.save(new AuditLog(event));
+        seatWebSocketService.broadcastSeatUpdate(event);
     }
 }

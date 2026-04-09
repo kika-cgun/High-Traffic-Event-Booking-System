@@ -36,3 +36,6 @@ build/
 
 # Environment secrets — never commit the real file
 .env
+
+# Git worktrees
+.worktrees/

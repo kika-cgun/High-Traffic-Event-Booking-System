@@ -6,11 +6,11 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB:event_booking_system_db}
     username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD}
+    password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -28,8 +28,8 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_DEFAULT_USER}
-    password: ${RABBITMQ_DEFAULT_PASS}
+    username: ${RABBITMQ_DEFAULT_USER:guest}
+    password: ${RABBITMQ_DEFAULT_PASS:guest}
 
   # Konfiguracja Kafka
   kafka:
@@ -44,5 +44,5 @@ spring:
 # Konfiguracja JWT
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    secret-key: ${JWT_SECRET_KEY:dev-secret-key-at-least-256-bits-long-for-hmac}
     expiration-time: ${JWT_EXPIRATION_TIME:3600000}
