@@ -1,0 +1,28 @@
+<div class="page-container">
+  <a class="back-link" (click)="router.navigate(['/events'])">
+    <mat-icon>arrow_back</mat-icon>
+    All events
+  </a>
+
+  @if (loading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else {
+    <header class="event-header">
+      <h1>Select your seat</h1>
+      <p class="seat-hint">
+        Green seats are available. Click to reserve — you'll need to be logged in.
+      </p>
+    </header>
+
+    @if (reserving()) {
+      <div class="reserving-overlay">
+        <mat-spinner diameter="28" />
+        <span>Reserving seat…</span>
+      </div>
+    }
+
+    <app-seat-grid [seats]="seats()" (seatSelected)="onSeatSelected($event)" />
+  }
+</div>
