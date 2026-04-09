@@ -1,0 +1,49 @@
+.ticket-card {
+  background: #ffffff;
+  border: 1px solid rgba(26, 26, 46, 0.08);
+  box-shadow: 0 1px 4px rgba(26, 26, 46, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+
+  &:hover {
+    border-color: rgba(94, 53, 177, 0.25);
+    box-shadow: 0 3px 12px rgba(94, 53, 177, 0.1);
+  }
+
+  &.cancelled {
+    opacity: 0.5;
+    border-color: rgba(26, 26, 46, 0.05);
+    box-shadow: none;
+  }
+
+  mat-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  mat-card-subtitle {
+    color: rgba(26, 26, 46, 0.55);
+    font-size: 0.85rem;
+  }
+
+  .chip-slot {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+.seat-info {
+  display: flex;
+  gap: 1.5rem;
+  color: rgba(26, 26, 46, 0.6);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+
+  strong {
+    color: #1a1a2e;
+    font-weight: 600;
+  }
+}
