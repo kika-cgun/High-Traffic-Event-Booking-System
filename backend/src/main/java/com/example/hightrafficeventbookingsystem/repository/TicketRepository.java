@@ -23,6 +23,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT DISTINCT t FROM Ticket t JOIN FETCH t.seats s JOIN FETCH s.event WHERE t.id = :id")
     Optional<Ticket> findByIdWithSeatsAndEvent(Long id);
 
-    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Ticket t JOIN t.seats s WHERE t.user.id = :userId AND s.event.id = :eventId AND t.status IN ('RESERVED', 'CONFIRMED')")
-    boolean existsActiveTicketForUserAndEvent(Long userId, Long eventId);
+    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Ticket t JOIN t.seats s WHERE t.user.id = :userId AND s.event.id = :eventId AND t.status IN :statuses")
+    boolean existsActiveTicketForUserAndEvent(Long userId, Long eventId, List<Status> statuses);
 }

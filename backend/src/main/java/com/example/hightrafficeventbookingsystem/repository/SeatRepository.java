@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,5 +19,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findByEventId(Long eventId);
 
     @Query("SELECT s FROM Seat s JOIN FETCH s.event WHERE s.id IN :ids")
-    List<Seat> findAllByIdWithEvent(List<Long> ids);
+    List<Seat> findAllByIdWithEvent(Collection<Long> ids);
 }
