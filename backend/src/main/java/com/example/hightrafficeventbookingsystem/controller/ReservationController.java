@@ -44,7 +44,7 @@ public class ReservationController {
             Authentication authentication
     ) {
         User currentUser = (User) authentication.getPrincipal();
-        Long ticketId = reservationService.reserveSeat(request.seatId(), currentUser.getId());
+        Long ticketId = reservationService.reserveSeats(request.seatIds(), currentUser.getId());
         return ResponseEntity.ok("Reservation successful. Ticket ID: " + ticketId);
     }
 }
