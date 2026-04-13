@@ -2,6 +2,7 @@ package com.example.hightrafficeventbookingsystem.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,7 @@ public class Ticket {
     private User user;
 
     @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Seat> seats = new ArrayList<>();
 
     private BigDecimal totalPrice;
