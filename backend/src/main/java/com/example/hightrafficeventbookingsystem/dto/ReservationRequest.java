@@ -1,11 +1,9 @@
 package com.example.hightrafficeventbookingsystem.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 
 public record ReservationRequest(
-        @NotNull(message = "Seat ID must not be null")
-        @Positive(message = "Seat ID must be a positive number")
-        Long seatId
-) {
-}
+    @NotEmpty(message = "seatIds must not be empty")
+    List<Long> seatIds
+) {}
