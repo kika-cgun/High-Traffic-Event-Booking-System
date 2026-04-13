@@ -3,6 +3,8 @@ package com.example.hightrafficeventbookingsystem.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -29,6 +31,14 @@ public class Seat {
 
     @Version
     private Integer version;
+
+    private BigDecimal price;
+
+    private String category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id")
+    private Ticket ticket;
 
     public boolean isReserved() {
         return Boolean.TRUE.equals(this.reserved);

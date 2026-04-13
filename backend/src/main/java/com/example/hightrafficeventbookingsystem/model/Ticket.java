@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,9 +25,10 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat;
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY)
+    private List<Seat> seats = new ArrayList<>();
+
+    private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
     private Status status;
