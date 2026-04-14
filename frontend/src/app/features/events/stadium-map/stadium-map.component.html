@@ -1,0 +1,55 @@
+@if (selectedSection()) {
+  <div class="section-view">
+    <button mat-button (click)="back()">
+      <mat-icon>arrow_back</mat-icon>
+      Powrot do mapy
+    </button>
+    <h3 class="section-title">Trybuna {{ selectedSection() }}</h3>
+    <app-seat-grid
+      [seats]="sectionSeats()"
+      [maxSeats]="maxSeats()"
+      (seatsSelected)="onSeatsSelected($event)" />
+  </div>
+} @else {
+  <div class="stadium-map-wrapper">
+    <div class="map-label top-label">Trybuna N</div>
+
+    <div class="map-row">
+      <div class="map-label side-label">Trybuna W</div>
+
+      <svg class="pitch-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pitch -->
+        <rect x="10" y="10" width="280" height="180" fill="#2d6a4f" rx="4"/>
+        <rect x="10" y="10" width="280" height="180" fill="none" stroke="#52b788" stroke-width="2" rx="4"/>
+        <!-- Center circle -->
+        <circle cx="150" cy="100" r="30" fill="none" stroke="#52b788" stroke-width="1.5"/>
+        <circle cx="150" cy="100" r="2" fill="#52b788"/>
+        <!-- Center line -->
+        <line x1="150" y1="10" x2="150" y2="190" stroke="#52b788" stroke-width="1.5"/>
+        <!-- Penalty boxes -->
+        <rect x="10" y="65" width="50" height="70" fill="none" stroke="#52b788" stroke-width="1.5"/>
+        <rect x="240" y="65" width="50" height="70" fill="none" stroke="#52b788" stroke-width="1.5"/>
+        <!-- Goal boxes -->
+        <rect x="10" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
+        <rect x="270" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
+      </svg>
+
+      <div class="map-label side-label">Trybuna E</div>
+    </div>
+
+    <div class="map-label bottom-label">Trybuna S</div>
+
+    <div class="sectors-grid">
+      @for (section of sections(); track section) {
+        <button class="sector-btn"
+          [class.sold-out]="sectionAvailability()[section]?.available === 0"
+          (click)="selectSection(section)">
+          <span class="sector-name">Trybuna {{ section }}</span>
+          <span class="sector-info">
+            {{ sectionAvailability()[section]?.available ?? 0 }} wolnych
+          </span>
+        </button>
+      }
+    </div>
+  </div>
+}
