@@ -6,17 +6,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SeatResponse } from '../../../shared/models/seat.model';
+import { EventResponse } from '../../../shared/models/event.model';
 import { EventService } from '../../../core/services/event.service';
 import { TicketService } from '../../../core/services/ticket.service';
 import { StompService } from '../../../core/services/stomp.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeatGridComponent } from '../../../shared/components/seat-grid/seat-grid.component';
+import { StadiumMapComponent } from '../stadium-map/stadium-map.component';
+import { ArenaMapComponent } from '../arena-map/arena-map.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
   imports: [
     SeatGridComponent,
+    StadiumMapComponent,
+    ArenaMapComponent,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
@@ -35,6 +40,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly seats = signal<SeatResponse[]>([]);
+  protected readonly event = signal<EventResponse | null>(null);
   protected readonly loading = signal(true);
   protected readonly reserving = signal(false);
 
@@ -43,7 +49,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.eventId = +this.route.snapshot.paramMap.get('id')!;
-    this.loadSeats();
+    this.loadData();
     this.subscribeToWebSocket();
   }
 
@@ -52,7 +58,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  protected onSeatSelected(seatIds: number[]): void {
+  protected onSeatsSelected(seatIds: number[]): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: `/events/${this.eventId}` },
@@ -62,22 +68,22 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
     this.reserving.set(true);
     this.ticketService.reserveSeats(seatIds).subscribe({
-      next: (ticketId: number) => {
+      next: ticketId => {
         this.reserving.set(false);
         this.router.navigate(['/checkout', ticketId]);
       },
-      error: (err: { status: number }) => {
+      error: err => {
         this.reserving.set(false);
         const msg =
-          err.status === 409
-            ? 'That seat was just taken. Please choose another.'
-            : 'Reservation failed. Try again.';
+          err.status === 409 ? 'Jedno z miejsc jest juz zajete. Wybierz inne.' :
+          err.status === 423 ? 'Miejsce jest aktualnie rezerwowane. Sprobuj ponownie.' :
+          'Rezerwacja nieudana. Sprobuj ponownie.';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
   }
 
-  private loadSeats(): void {
+  private loadData(): void {
     this.loading.set(true);
     this.eventService.getSeats(this.eventId).subscribe({
       next: seats => {
@@ -85,6 +91,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
+    });
+    this.eventService.getEvent(this.eventId).subscribe({
+      next: ev => this.event.set(ev),
     });
   }
 

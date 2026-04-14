@@ -1,7 +1,7 @@
 <div class="page-container">
   <a class="back-link" (click)="router.navigate(['/events'])">
     <mat-icon>arrow_back</mat-icon>
-    All events
+    Wszystkie eventy
   </a>
 
   @if (loading()) {
@@ -10,19 +10,38 @@
     </div>
   } @else {
     <header class="event-header">
-      <h1>Select your seat</h1>
+      <h1>{{ event()?.name ?? 'Wybierz miejsca' }}</h1>
       <p class="seat-hint">
-        Green seats are available. Click to reserve — you'll need to be logged in.
+        Zaznacz miejsca (maks. {{ event()?.maxSeatsPerBooking ?? 10 }}) i kliknij Zarezerwuj.
       </p>
     </header>
 
     @if (reserving()) {
       <div class="reserving-overlay">
         <mat-spinner diameter="28" />
-        <span>Reserving seat…</span>
+        <span>Rezerwowanie...</span>
       </div>
     }
 
-    <app-seat-grid [seats]="seats()" (seatsSelected)="onSeatSelected($event)" />
+    @switch (event()?.venueType) {
+      @case ('STADIUM') {
+        <app-stadium-map
+          [seats]="seats()"
+          [maxSeats]="event()?.maxSeatsPerBooking ?? 4"
+          (seatsSelected)="onSeatsSelected($event)" />
+      }
+      @case ('CONCERT_ARENA') {
+        <app-arena-map
+          [seats]="seats()"
+          [maxSeats]="event()?.maxSeatsPerBooking ?? 6"
+          (seatsSelected)="onSeatsSelected($event)" />
+      }
+      @default {
+        <app-seat-grid
+          [seats]="seats()"
+          [maxSeats]="event()?.maxSeatsPerBooking ?? 8"
+          (seatsSelected)="onSeatsSelected($event)" />
+      }
+    }
   }
 </div>

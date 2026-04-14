@@ -19,4 +19,8 @@ export class EventService {
   getSeats(eventId: number): Observable<SeatResponse[]> {
     return this.http.get<SeatResponse[]>(`/api/events/${eventId}/seats`);
   }
+
+  getEvent(eventId: number): Observable<EventResponse> {
+    return this.http.get<EventResponse>(`/api/events/${eventId}`);
+  }
 }
