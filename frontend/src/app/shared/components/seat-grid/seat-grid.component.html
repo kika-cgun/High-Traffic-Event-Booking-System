@@ -1,9 +1,9 @@
 <div class="grid-wrapper">
-  <div class="stage">STAGE</div>
+  <div class="stage">STAGE / SCENA</div>
 
   @for (sec of sections(); track sec.section) {
     <div class="section">
-      <h3 class="section-label">Section {{ sec.section }}</h3>
+      <h3 class="section-label">Sekcja {{ sec.section }}</h3>
 
       @for (row of sec.rows; track row.rowNumber) {
         <div class="seat-row">
@@ -12,11 +12,12 @@
           @for (seat of row.seats; track seat.id) {
             <button
               class="seat-btn"
-              [class.available]="!seat.reserved"
+              [class.available]="!seat.reserved && !isSelected(seat)"
+              [class.selected]="isSelected(seat)"
               [class.reserved]="seat.reserved"
               [disabled]="seat.reserved"
-              [matTooltip]="seat.reserved ? 'Reserved' : 'Row ' + seat.rowNumber + ', Seat ' + seat.seatNumber"
-              (click)="select(seat)">
+              [matTooltip]="seat.reserved ? 'Zarezerwowane' : (isSelected(seat) ? 'Kliknij aby odznaczic' : 'Rzad ' + seat.rowNumber + ', Miejsce ' + seat.seatNumber + ' — ' + seat.price + ' PLN')"
+              (click)="toggle(seat)">
               {{ seat.seatNumber }}
             </button>
           }
@@ -26,7 +27,17 @@
   }
 
   <div class="legend">
-    <span class="legend-item"><span class="dot available"></span> Available</span>
-    <span class="legend-item"><span class="dot reserved"></span> Reserved</span>
+    <span class="legend-item"><span class="dot available"></span> Wolne</span>
+    <span class="legend-item"><span class="dot selected"></span> Wybrane</span>
+    <span class="legend-item"><span class="dot reserved"></span> Zarezerwowane</span>
   </div>
+
+  @if (selectedCount() > 0) {
+    <div class="reserve-bar">
+      <button mat-flat-button color="primary" (click)="reserve()">
+        Zarezerwuj {{ selectedCount() }} {{ selectedCount() === 1 ? 'miejsce' : 'miejsca' }}
+        — {{ totalPrice() | currency:'PLN':'symbol':'1.2-2':'pl' }}
+      </button>
+    </div>
+  }
 </div>

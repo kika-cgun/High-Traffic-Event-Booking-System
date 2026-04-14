@@ -52,7 +52,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  protected onSeatSelected(seat: SeatResponse): void {
+  protected onSeatSelected(seatIds: number[]): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: `/events/${this.eventId}` },
@@ -61,7 +61,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     }
 
     this.reserving.set(true);
-    this.ticketService.reserveSeats([seat.id]).subscribe({
+    this.ticketService.reserveSeats(seatIds).subscribe({
       next: (ticketId: number) => {
         this.reserving.set(false);
         this.router.navigate(['/checkout', ticketId]);
