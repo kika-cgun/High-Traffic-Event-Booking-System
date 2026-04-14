@@ -26,12 +26,14 @@ public class TicketService {
     private final SeatRepository seatRepository;
     private final ReservationEventProducer reservationEventProducer;
 
+    @Transactional(readOnly = true)
     public List<TicketResponse> listMyTickets(Long userId) {
         return ticketRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
             .map(this::toResponse)
             .toList();
     }
 
+    @Transactional(readOnly = true)
     public TicketResponse getTicketById(Long ticketId, Long userId) {
         Ticket ticket = ticketRepository.findByIdWithSeatsAndEvent(ticketId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
@@ -55,16 +57,15 @@ public class TicketService {
     @Transactional
     public void cancelReservation(Long ticketId, Long userId) {
         Ticket ticket = findAndValidate(ticketId, userId);
-        if (ticket.getStatus() == Status.CANCELLED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ticket is already cancelled");
+        if (ticket.getStatus() != Status.RESERVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only RESERVED tickets can be cancelled");
         }
         ticket.setStatus(Status.CANCELLED);
-        ticketRepository.save(ticket);
-
         for (Seat seat : ticket.getSeats()) {
             seat.setReserved(false);
             seat.setTicket(null);
         }
+        ticketRepository.save(ticket);
         seatRepository.saveAll(ticket.getSeats());
 
         publishForAllSeats(ticket, ReservationEvent.ReservationAction.CANCELLED);

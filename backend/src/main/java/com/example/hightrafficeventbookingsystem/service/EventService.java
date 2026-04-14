@@ -42,7 +42,7 @@ public class EventService {
 
     public List<SeatResponse> listSeats(Long eventId) {
         if (!eventRepository.existsById(eventId)) {
-            throw new IllegalArgumentException("Event not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
         return seatRepository.findByEventId(eventId).stream()
                 .map(this::toSeatResponse)
