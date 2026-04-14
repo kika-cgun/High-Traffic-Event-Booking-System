@@ -15,7 +15,9 @@
   } @else {
     <div class="ticket-list">
       @for (ticket of tickets(); track ticket.id) {
-        <app-ticket-card [ticket]="ticket" (cancelled)="onCancel($event)" />
+        <div [routerLink]="['/tickets', ticket.id]" class="ticket-link">
+          <app-ticket-card [ticket]="ticket" (cancelled)="onCancel($event)" />
+        </div>
       }
     </div>
   }

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +10,7 @@ import { TicketCardComponent } from '../../../shared/components/ticket-card/tick
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [TicketCardComponent, MatProgressSpinnerModule, MatSnackBarModule, MatIconModule],
+  imports: [RouterLink, TicketCardComponent, MatProgressSpinnerModule, MatSnackBarModule, MatIconModule],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.scss',
 })

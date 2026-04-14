@@ -43,3 +43,14 @@
   gap: 1rem;
   max-width: 680px;
 }
+
+.ticket-link {
+  cursor: pointer;
+  display: block;
+
+  &:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+  }
+}
