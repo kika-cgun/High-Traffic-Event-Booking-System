@@ -29,6 +29,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.listEvents(pageable));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EventResponse> getEvent(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getEvent(id));
+    }
+
     @Operation(summary = "List seats for an event", description = "Returns all seats with availability status. Public — no auth required.")
     @GetMapping("/{id}/seats")
     public ResponseEntity<List<SeatResponse>> listSeats(@PathVariable Long id) {

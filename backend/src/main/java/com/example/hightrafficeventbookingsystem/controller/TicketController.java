@@ -22,6 +22,13 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    @Operation(summary = "Get ticket by ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<TicketResponse> getTicket(@PathVariable Long id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(ticketService.getTicketById(id, user.getId()));
+    }
+
     @Operation(summary = "Get my tickets")
     @GetMapping("/my")
     public ResponseEntity<List<TicketResponse>> listMyTickets(Authentication authentication) {

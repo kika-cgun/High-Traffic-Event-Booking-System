@@ -2,13 +2,16 @@ package com.example.hightrafficeventbookingsystem.service;
 
 import com.example.hightrafficeventbookingsystem.dto.EventResponse;
 import com.example.hightrafficeventbookingsystem.dto.SeatResponse;
+import com.example.hightrafficeventbookingsystem.model.Event;
 import com.example.hightrafficeventbookingsystem.model.Seat;
 import com.example.hightrafficeventbookingsystem.repository.EventRepository;
 import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,8 +26,18 @@ public class EventService {
         return eventRepository.findAll(pageable).map(event -> {
             long available = seatRepository.findByEventId(event.getId())
                     .stream().filter(s -> !s.isReserved()).count();
-            return new EventResponse(event.getId(), event.getName(), event.getDate(), available);
+            return new EventResponse(event.getId(), event.getName(), event.getDate(),
+                    event.getVenueType(), event.getMaxSeatsPerBooking(), available);
         });
+    }
+
+    public EventResponse getEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+        long available = seatRepository.findByEventId(eventId).stream()
+                .filter(s -> !s.isReserved()).count();
+        return new EventResponse(event.getId(), event.getName(), event.getDate(),
+                event.getVenueType(), event.getMaxSeatsPerBooking(), available);
     }
 
     public List<SeatResponse> listSeats(Long eventId) {
@@ -37,6 +50,9 @@ public class EventService {
     }
 
     private SeatResponse toSeatResponse(Seat seat) {
-        return new SeatResponse(seat.getId(), seat.getSeatNumber(), seat.getRowNumber(), seat.getSection(), seat.isReserved());
+        return new SeatResponse(
+                seat.getId(), seat.getSeatNumber(), seat.getRowNumber(),
+                seat.getSection(), seat.getCategory(), seat.getPrice(), seat.isReserved()
+        );
     }
 }
