@@ -1,11 +1,15 @@
+import { SeatInfo } from './seat.model';
+
 export type TicketStatus = 'RESERVED' | 'CONFIRMED' | 'PAID' | 'CANCELLED';
+export type VenueType = 'CINEMA' | 'STADIUM' | 'CONCERT_ARENA';
 
 export interface TicketResponse {
   id: number;
   status: TicketStatus;
-  createdAt: string; // ISO date string
+  createdAt: string;
   eventName: string;
-  seatNumber: number;
-  rowNumber: number;
-  section: string;
+  eventDate: string;
+  venueType: VenueType;
+  seats: SeatInfo[];
+  totalPrice: number;
 }

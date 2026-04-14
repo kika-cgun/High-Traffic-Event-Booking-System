@@ -21,28 +21,28 @@
             <mat-divider />
             <div class="summary-row">
               <span class="label">Section</span>
-              <span class="value">{{ ticket()!.section }}</span>
+              <span class="value">{{ ticket()!.seats[0]?.section }}</span>
             </div>
             <mat-divider />
             <div class="summary-row">
               <span class="label">Row</span>
-              <span class="value">{{ ticket()!.rowNumber }}</span>
+              <span class="value">{{ ticket()!.seats[0]?.rowNumber }}</span>
             </div>
             <mat-divider />
             <div class="summary-row">
               <span class="label">Seat</span>
-              <span class="value">{{ ticket()!.seatNumber }}</span>
+              <span class="value">{{ ticket()!.seats[0]?.seatNumber }}</span>
             </div>
             <mat-divider />
             <div class="summary-row price-row">
               <span class="label">Total</span>
-              <span class="price">50 PLN</span>
+              <span class="price">{{ ticket()!.totalPrice }} PLN</span>
             </div>
           </div>
 
           <button mat-raised-button color="primary" class="pay-btn" (click)="pay()">
             <mat-icon>credit_card</mat-icon>
-            Pay now — 50 PLN
+            Pay now — {{ ticket()!.totalPrice }} PLN
           </button>
         </div>
       }

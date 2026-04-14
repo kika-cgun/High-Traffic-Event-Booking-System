@@ -3,7 +3,18 @@ export interface SeatResponse {
   seatNumber: number;
   rowNumber: number;
   section: string;
+  category: string;
+  price: number;
   reserved: boolean;
+}
+
+export interface SeatInfo {
+  id: number;
+  seatNumber: number;
+  rowNumber: number;
+  section: string;
+  category: string;
+  price: number;
 }
 
 export interface SeatStatusUpdate {

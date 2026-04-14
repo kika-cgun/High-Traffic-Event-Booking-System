@@ -1,7 +1,11 @@
+import { VenueType } from './ticket.model';
+
 export interface EventResponse {
   id: number;
   name: string;
-  date: string; // ISO date string (LocalDateTime serialized by Spring)
+  date: string;
+  venueType: VenueType;
+  maxSeatsPerBooking: number;
   availableSeats: number;
 }
 

@@ -13,9 +13,12 @@
 
   <mat-card-content>
     <div class="seat-info">
-      <span>Section <strong>{{ ticket().section }}</strong></span>
-      <span>Row <strong>{{ ticket().rowNumber }}</strong></span>
-      <span>Seat <strong>{{ ticket().seatNumber }}</strong></span>
+      <span>Section <strong>{{ ticket().seats[0]?.section }}</strong></span>
+      <span>Row <strong>{{ ticket().seats[0]?.rowNumber }}</strong></span>
+      <span>Seat <strong>{{ ticket().seats[0]?.seatNumber }}</strong></span>
+      @if (ticket().seats.length > 1) {
+        <span class="more-seats">+{{ ticket().seats.length - 1 }} more</span>
+      }
     </div>
   </mat-card-content>
 

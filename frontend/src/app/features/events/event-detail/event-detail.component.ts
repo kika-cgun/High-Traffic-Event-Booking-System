@@ -61,12 +61,12 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     }
 
     this.reserving.set(true);
-    this.ticketService.reserveSeat(seat.id).subscribe({
-      next: ticketId => {
+    this.ticketService.reserveSeats([seat.id]).subscribe({
+      next: (ticketId: number) => {
         this.reserving.set(false);
         this.router.navigate(['/checkout', ticketId]);
       },
-      error: err => {
+      error: (err: { status: number }) => {
         this.reserving.set(false);
         const msg =
           err.status === 409

@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 import { TicketResponse } from '../../shared/models/ticket.model';
 
 @Injectable({ providedIn: 'root' })
@@ -12,9 +11,13 @@ export class TicketService {
     return this.http.get<TicketResponse[]>('/api/tickets/my');
   }
 
-  reserveSeat(seatId: number): Observable<number> {
+  getTicket(ticketId: number): Observable<TicketResponse> {
+    return this.http.get<TicketResponse>(`/api/tickets/${ticketId}`);
+  }
+
+  reserveSeats(seatIds: number[]): Observable<number> {
     return this.http
-      .post('/api/reservations', { seatId }, { responseType: 'text' })
+      .post('/api/reservations', { seatIds }, { responseType: 'text' })
       .pipe(
         map(response => {
           const match = response.match(/Ticket ID: (\d+)/);
