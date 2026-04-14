@@ -1,0 +1,50 @@
+@if (view() === 'map') {
+  <div class="arena-map-wrapper">
+    <div class="stage-label">SCENA</div>
+
+    <button class="zone-btn pit-zone"
+      [class.sold-out]="pitSeats().length === 0"
+      (click)="selectPit()">
+      <span class="zone-name">PIT</span>
+      <span class="zone-info">{{ pitSeats().length }} wolnych</span>
+    </button>
+
+    <div class="zones-grid">
+      @for (section of nonPitSections(); track section) {
+        <button class="zone-btn"
+          [class.sold-out]="sectionAvailability()[section]?.available === 0"
+          (click)="selectSection(section)">
+          <span class="zone-name">{{ section }}</span>
+          <span class="zone-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+        </button>
+      }
+    </div>
+  </div>
+}
+
+@if (view() === 'pit') {
+  <div class="section-view">
+    <button mat-button (click)="back()">
+      <mat-icon>arrow_back</mat-icon>
+      Powrot do mapy
+    </button>
+    <app-pit-selector
+      [maxSeats]="maxSeats()"
+      [pricePerSeat]="pitPrice()"
+      (pitCount)="onPitCount($event)" />
+  </div>
+}
+
+@if (view() === 'section') {
+  <div class="section-view">
+    <button mat-button (click)="back()">
+      <mat-icon>arrow_back</mat-icon>
+      Powrot do mapy
+    </button>
+    <h3 class="section-title">{{ selectedSection() }}</h3>
+    <app-seat-grid
+      [seats]="sectionSeats()"
+      [maxSeats]="maxSeats()"
+      (seatsSelected)="onSectionSeatsSelected($event)" />
+  </div>
+}
