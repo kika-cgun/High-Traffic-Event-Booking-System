@@ -2,6 +2,7 @@ package com.example.hightrafficeventbookingsystem.controller;
 
 import com.example.hightrafficeventbookingsystem.dto.TicketResponse;
 import com.example.hightrafficeventbookingsystem.model.User;
+import com.example.hightrafficeventbookingsystem.service.PdfTicketService;
 import com.example.hightrafficeventbookingsystem.service.TicketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,6 +22,7 @@ import java.util.List;
 public class TicketController {
 
     private final TicketService ticketService;
+    private final PdfTicketService pdfTicketService;
 
     @Operation(summary = "Get ticket by ID")
     @GetMapping("/{id}")
@@ -50,5 +52,16 @@ public class TicketController {
         User user = (User) authentication.getPrincipal();
         ticketService.cancelReservation(id, user.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Download ticket as PDF")
+    @GetMapping(value = "/{id}/pdf", produces = "application/pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        byte[] pdf = pdfTicketService.generatePdf(id, user.getId());
+        return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=\"bilet-" + id + ".pdf\"")
+            .header("Content-Type", "application/pdf")
+            .body(pdf);
     }
 }
