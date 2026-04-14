@@ -2,7 +2,11 @@ package com.example.hightrafficeventbookingsystem.service;
 
 import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
 import com.example.hightrafficeventbookingsystem.dto.TicketCreatedEvent;
-import com.example.hightrafficeventbookingsystem.model.*;
+import com.example.hightrafficeventbookingsystem.model.Event;
+import com.example.hightrafficeventbookingsystem.model.Seat;
+import com.example.hightrafficeventbookingsystem.model.Status;
+import com.example.hightrafficeventbookingsystem.model.Ticket;
+import com.example.hightrafficeventbookingsystem.model.User;
 import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.repository.TicketRepository;
 import com.example.hightrafficeventbookingsystem.repository.UserRepository;
@@ -36,9 +40,11 @@ public class ReservationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "seatIds must not be empty");
         }
 
+        List<Long> uniqueSeatIds = seatIds.stream().distinct().toList();
+
         // Load all seats with their events in one query
-        List<Seat> seats = seatRepository.findAllByIdWithEvent(seatIds);
-        if (seats.size() != seatIds.size()) {
+        List<Seat> seats = seatRepository.findAllByIdWithEvent(uniqueSeatIds);
+        if (seats.size() != uniqueSeatIds.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "One or more seats not found");
         }
 
@@ -50,7 +56,7 @@ public class ReservationService {
         }
 
         // Enforce per-event seat limit
-        if (event.getMaxSeatsPerBooking() != null && seatIds.size() > event.getMaxSeatsPerBooking()) {
+        if (event.getMaxSeatsPerBooking() != null && uniqueSeatIds.size() > event.getMaxSeatsPerBooking()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Cannot book more than " + event.getMaxSeatsPerBooking() + " seats for this event");
         }
@@ -65,13 +71,16 @@ public class ReservationService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // Sort seats by ID to prevent deadlocks when acquiring locks in consistent order
+        seats = seats.stream().sorted(java.util.Comparator.comparing(Seat::getId)).toList();
+
         // Acquire Redis locks for all seats
         List<Long> locked = new ArrayList<>();
         try {
             for (Seat seat : seats) {
                 boolean acquired = redisLockService.acquireLock(seat.getId(), userId);
                 if (!acquired) {
-                    throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    throw new ResponseStatusException(HttpStatus.LOCKED,
                         "Seat " + seat.getId() + " is currently being reserved. Try again.");
                 }
                 locked.add(seat.getId());
@@ -101,17 +110,18 @@ public class ReservationService {
             for (Seat seat : seats) {
                 seat.setReserved(true);
                 seat.setTicket(ticket);
-                seatRepository.save(seat);
             }
+            seatRepository.saveAll(seats);
 
             // RabbitMQ event (PDF generation + notification)
             notificationProducer.sendTicketNotification(new TicketCreatedEvent(ticket.getId(), user.getEmail()));
 
             // Kafka event per seat (WebSocket broadcast + audit log)
+            Instant now = Instant.now();
             for (Seat seat : seats) {
                 ReservationEvent kafkaEvent = new ReservationEvent(
                     ticket.getId(), user.getId(), seat.getId(), event.getId(),
-                    event.getName(), ReservationEvent.ReservationAction.RESERVED, Instant.now()
+                    event.getName(), ReservationEvent.ReservationAction.RESERVED, now
                 );
                 reservationEventProducer.publish(kafkaEvent);
             }

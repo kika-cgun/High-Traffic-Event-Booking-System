@@ -127,7 +127,7 @@ class ReservationConcurrencyTest {
                     latch.countDown();
                     latch.await();
 
-                    reservationService.reserveSeat(seatId, userId);
+                    reservationService.reserveSeats(List.of(seatId), userId);
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {

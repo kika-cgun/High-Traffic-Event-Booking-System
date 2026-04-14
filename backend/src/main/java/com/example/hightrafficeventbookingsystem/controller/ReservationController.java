@@ -27,15 +27,16 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @Operation(
-            summary = "Make a reservation for a seat",
-            description = "Reserves the selected seat for the authenticated user. Uses Redis distributed lock and Optimistic Locking."
+            summary = "Reserve one or more seats for an event",
+            description = "Reserves the selected seats (multi-seat) for the authenticated user. All seats must belong to the same event. Uses Redis distributed locking per seat and enforces per-event booking limits."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reservation successful"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "200", description = "Reservation successful — returns ticket ID"),
+            @ApiResponse(responseCode = "400", description = "Invalid input — empty seatIds, seats belong to different events, or exceeds max seats per booking"),
             @ApiResponse(responseCode = "401", description = "Unauthorized — JWT token missing or invalid"),
-            @ApiResponse(responseCode = "404", description = "Seat or user not found"),
-            @ApiResponse(responseCode = "409", description = "Seat is already reserved"),
+            @ApiResponse(responseCode = "404", description = "One or more seats or the user not found"),
+            @ApiResponse(responseCode = "409", description = "Already reserved — seat is taken or user already has an active ticket for this event"),
+            @ApiResponse(responseCode = "423", description = "Seat locked — seat is currently being reserved by another request, try again"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
