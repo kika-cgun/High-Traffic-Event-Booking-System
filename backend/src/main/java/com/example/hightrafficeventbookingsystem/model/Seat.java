@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"event_id", "rowNumber", "seatNumber"})
+        @UniqueConstraint(columnNames = {"event_id", "section", "row_number", "seat_number"})
 })
 public class Seat {
     @Id
