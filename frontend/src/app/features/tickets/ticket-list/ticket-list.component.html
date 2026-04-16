@@ -1,0 +1,24 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>My Tickets</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (tickets().length === 0) {
+    <div class="empty-state">
+      <mat-icon>confirmation_number</mat-icon>
+      <p>You don't have any tickets yet.</p>
+    </div>
+  } @else {
+    <div class="ticket-list">
+      @for (ticket of tickets(); track ticket.id) {
+        <div [routerLink]="['/tickets', ticket.id]" class="ticket-link">
+          <app-ticket-card [ticket]="ticket" (cancelled)="onCancel($event)" />
+        </div>
+      }
+    </div>
+  }
+</div>

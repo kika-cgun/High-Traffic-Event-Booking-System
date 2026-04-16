@@ -1,0 +1,33 @@
+<mat-card class="ticket-card" [class.cancelled]="ticket().status === 'CANCELLED'">
+  <mat-card-header>
+    <mat-card-title>{{ ticket().eventName }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ ticket().createdAt | date:'d MMM y, HH:mm' }}
+    </mat-card-subtitle>
+    <div class="chip-slot">
+      <mat-chip [color]="statusColor(ticket().status)" highlighted>
+        {{ statusLabel(ticket().status) }}
+      </mat-chip>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="seat-info">
+      <span>Section <strong>{{ ticket().seats[0]?.section }}</strong></span>
+      <span>Row <strong>{{ ticket().seats[0]?.rowNumber }}</strong></span>
+      <span>Seat <strong>{{ ticket().seats[0]?.seatNumber }}</strong></span>
+      @if (ticket().seats.length > 1) {
+        <span class="more-seats">+{{ ticket().seats.length - 1 }} more</span>
+      }
+    </div>
+  </mat-card-content>
+
+  @if (ticket().status === 'RESERVED') {
+    <mat-card-actions>
+      <button mat-stroked-button color="warn" (click)="cancelled.emit(ticket().id)">
+        <mat-icon>cancel</mat-icon>
+        Cancel reservation
+      </button>
+    </mat-card-actions>
+  }
+</mat-card>

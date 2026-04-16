@@ -1,0 +1,116 @@
+.arena-svg-wrapper {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.arena-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 24px rgba(26, 26, 46, 0.06));
+
+  .stage-path {
+    fill: rgba(26, 26, 46, 0.04);
+    stroke: rgba(26, 26, 46, 0.14);
+    stroke-width: 2;
+  }
+  
+  .stage-text {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    letter-spacing: 0.22em;
+    fill: rgba(26, 26, 46, 0.45);
+    text-anchor: middle;
+    alignment-baseline: middle;
+    pointer-events: none;
+  }
+
+  .zone-group {
+    cursor: pointer;
+
+    &.sold-out {
+      opacity: 0.35;
+      cursor: not-allowed;
+      .zone-subtitle {
+        fill: #ef4444;
+      }
+    }
+
+    &:hover:not(.sold-out) {
+      .zone-path {
+        stroke-width: 3;
+      }
+      
+      .pit-path { fill: rgba(245, 158, 11, 0.15); stroke: rgba(245, 158, 11, 0.8); }
+      .zone-parter-l, .zone-parter-r { fill: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.35); }
+      .zone-trybuna-glowna { fill: rgba(16, 185, 129, 0.11); stroke: rgba(16, 185, 129, 0.38); }
+      .zone-balkon-l, .zone-balkon-r { fill: rgba(139, 92, 246, 0.12); stroke: rgba(139, 92, 246, 0.38); }
+      .zone-gorna-trybuna { fill: rgba(99, 102, 241, 0.12); stroke: rgba(99, 102, 241, 0.35); }
+    }
+  }
+
+  .zone-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    fill: #1a1a2e;
+    text-anchor: middle;
+    alignment-baseline: middle;
+    pointer-events: none;
+  }
+
+  .zone-subtitle {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    fill: rgba(26, 26, 46, 0.55);
+    text-anchor: middle;
+    alignment-baseline: middle;
+    pointer-events: none;
+  }
+
+  .zone-path {
+    stroke-width: 1.5;
+    transition: all 0.2s ease;
+  }
+
+  // Base Colors
+  .pit-path { 
+    fill: rgba(245, 158, 11, 0.08); 
+    stroke: rgba(245, 158, 11, 0.5); 
+    stroke-dasharray: 8 6;
+  }
+  .zone-parter-l, .zone-parter-r { 
+    fill: rgba(245, 158, 11, 0.03); 
+    stroke: rgba(245, 158, 11, 0.18);
+  }
+  .zone-trybuna-glowna {
+    fill: rgba(16, 185, 129, 0.03);
+    stroke: rgba(16, 185, 129, 0.2);
+  }
+  .zone-balkon-l, .zone-balkon-r {
+    fill: rgba(139, 92, 246, 0.03);
+    stroke: rgba(139, 92, 246, 0.2);
+  }
+  .zone-gorna-trybuna {
+    fill: rgba(99, 102, 241, 0.03);
+    stroke: rgba(99, 102, 241, 0.18);
+  }
+}
+
+// ─────────────────────────────────────────────
+// SECTION DETAIL VIEW
+// ─────────────────────────────────────────────
+.section-view {
+  padding: 1rem;
+  width: 100%;
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0.5rem 0 1rem;
+  }
+}

@@ -1,0 +1,27 @@
+<mat-toolbar class="app-toolbar">
+  <a routerLink="/events" class="brand">
+    <mat-icon>confirmation_number</mat-icon>
+    <span>BookIt</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  <nav class="nav-links">
+    <a mat-button routerLink="/events" routerLinkActive="active-link">Events</a>
+
+    @if (authService.isLoggedIn()) {
+      <a mat-button routerLink="/tickets" routerLinkActive="active-link">My Tickets</a>
+      <button mat-button (click)="authService.logout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    } @else {
+      <a mat-button routerLink="/login">Login</a>
+      <a mat-raised-button color="primary" routerLink="/register">Register</a>
+    }
+  </nav>
+</mat-toolbar>
+
+<main>
+  <router-outlet />
+</main>

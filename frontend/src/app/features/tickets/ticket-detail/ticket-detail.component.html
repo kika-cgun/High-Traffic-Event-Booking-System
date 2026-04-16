@@ -1,0 +1,71 @@
+<div class="page-container">
+  <a class="back-link" routerLink="/tickets">
+    <mat-icon>arrow_back</mat-icon>
+    Moje bilety
+  </a>
+
+  @if (loading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (ticket()) {
+    <div class="ticket-detail">
+      <header class="ticket-header">
+        <div class="header-top">
+          <h1>{{ ticket()!.eventName }}</h1>
+          <mat-chip [color]="statusColor(ticket()!.status)" highlighted>
+            {{ ticket()!.status }}
+          </mat-chip>
+        </div>
+        <p class="event-date">{{ ticket()!.eventDate | date:'EEEE, d MMMM yyyy, HH:mm':'':'pl' }}</p>
+        <p class="venue-type">{{ ticket()!.venueType }}</p>
+      </header>
+
+      <section class="seats-section">
+        <h2>Twoje miejsca</h2>
+        <table class="seats-table">
+          <thead>
+            <tr>
+              <th>Sekcja</th>
+              <th>Rzad</th>
+              <th>Miejsce</th>
+              <th>Kategoria</th>
+              <th>Cena</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (seat of ticket()!.seats; track seat.id) {
+              <tr>
+                <td>{{ seat.section }}</td>
+                <td>{{ seat.rowNumber }}</td>
+                <td>{{ seat.seatNumber }}</td>
+                <td>{{ seat.category }}</td>
+                <td>{{ seat.price | currency:'PLN':'symbol':'1.2-2':'pl' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <p class="total-price">
+          Lacznie: <strong>{{ ticket()!.totalPrice | currency:'PLN':'symbol':'1.2-2':'pl' }}</strong>
+        </p>
+      </section>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" (click)="downloadPdf()">
+          <mat-icon>download</mat-icon>
+          Pobierz PDF
+        </button>
+        @if (canCancel()) {
+          <button mat-stroked-button color="warn" [disabled]="cancelling()" (click)="cancel()">
+            @if (cancelling()) {
+              <mat-spinner diameter="18" />
+            } @else {
+              <mat-icon>cancel</mat-icon>
+            }
+            Anuluj rezerwacje
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

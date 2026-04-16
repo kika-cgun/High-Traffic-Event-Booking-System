@@ -1,0 +1,38 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(26, 26, 46, 0.1);
+  box-shadow: 0 1px 3px rgba(26, 26, 46, 0.08);
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: #1a1a2e;
+    text-decoration: none;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .active-link {
+    font-weight: 600;
+  }
+}
+
+main {
+  min-height: calc(100vh - 64px);
+}

@@ -1,0 +1,62 @@
+.page-header {
+  margin-bottom: 2.5rem;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.03em;
+    color: #1a1a2e;
+  }
+
+  .subtitle {
+    color: rgba(26, 26, 46, 0.55);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 5rem;
+}
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.event-card {
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid rgba(26, 26, 46, 0.08);
+  box-shadow: 0 1px 4px rgba(26, 26, 46, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(94, 53, 177, 0.15);
+  }
+
+  mat-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  mat-card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+    color: rgba(26, 26, 46, 0.6);
+  }
+
+  .seat-badge {
+    margin-top: 0.75rem;
+  }
+}
