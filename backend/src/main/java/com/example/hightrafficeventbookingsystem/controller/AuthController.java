@@ -2,6 +2,7 @@ package com.example.hightrafficeventbookingsystem.controller;
 
 import com.example.hightrafficeventbookingsystem.dto.AuthRequest;
 import com.example.hightrafficeventbookingsystem.dto.AuthResponse;
+import com.example.hightrafficeventbookingsystem.dto.RefreshTokenRequest;
 import com.example.hightrafficeventbookingsystem.dto.RegisterRequest;
 import com.example.hightrafficeventbookingsystem.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,5 +34,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @Operation(summary = "Refresh JWT", description = "Returns a new access token and refresh token pair")
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request));
     }
 }

@@ -26,10 +26,10 @@ describe('TicketService', () => {
 
   it('should POST /api/reservations and parse ticket ID from plain-text response', () => {
     let ticketId: number | undefined;
-    service.reserveSeat(7).subscribe(id => (ticketId = id));
+    service.reserveSeats([7]).subscribe((id: number) => (ticketId = id));
     const req = httpMock.expectOne('/api/reservations');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ seatId: 7 });
+    expect(req.request.body).toEqual({ seatIds: [7] });
     req.flush('Reservation successful. Ticket ID: 42', {
       headers: { 'Content-Type': 'text/plain' },
     });

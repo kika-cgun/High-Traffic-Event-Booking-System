@@ -15,17 +15,37 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private static final String TOKEN_TYPE_CLAIM = "token_type";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
+
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
     @Value("${security.jwt.expiration-time}")
     private long expirationTime;
 
+    @Value("${security.jwt.refresh-expiration-time}")
+    private long refreshExpirationTime;
+
     public String generateToken(UserDetails userDetails) {
+        return generateAccessToken(userDetails);
+    }
+
+    public String generateAccessToken(UserDetails userDetails) {
+        return buildToken(userDetails, expirationTime, ACCESS_TOKEN_TYPE);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(userDetails, refreshExpirationTime, REFRESH_TOKEN_TYPE);
+    }
+
+    private String buildToken(UserDetails userDetails, long tokenExpirationTime, String tokenType) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim(TOKEN_TYPE_CLAIM, tokenType)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .expiration(new Date(System.currentTimeMillis() + tokenExpirationTime))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -35,8 +55,32 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
+        return isAccessTokenValid(token, userDetails);
+    }
+
+    public boolean isAccessTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username.equals(userDetails.getUsername())
+                && hasExpectedTokenType(token, ACCESS_TOKEN_TYPE)
+                && !isTokenExpired(token);
+    }
+
+    public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername())
+                && hasExpectedTokenType(token, REFRESH_TOKEN_TYPE)
+                && !isTokenExpired(token);
+    }
+
+    private boolean hasExpectedTokenType(String token, String expectedTokenType) {
+        String tokenType = extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class));
+
+        // Backward compatibility: old tokens without token_type are treated as access tokens.
+        if (tokenType == null) {
+            return ACCESS_TOKEN_TYPE.equals(expectedTokenType);
+        }
+
+        return expectedTokenType.equals(tokenType);
     }
 
     private boolean isTokenExpired(String token) {

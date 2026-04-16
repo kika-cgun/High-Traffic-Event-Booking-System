@@ -2,16 +2,20 @@ package com.example.hightrafficeventbookingsystem.service;
 
 import com.example.hightrafficeventbookingsystem.dto.AuthRequest;
 import com.example.hightrafficeventbookingsystem.dto.AuthResponse;
+import com.example.hightrafficeventbookingsystem.dto.RefreshTokenRequest;
 import com.example.hightrafficeventbookingsystem.dto.RegisterRequest;
 import com.example.hightrafficeventbookingsystem.model.Role;
 import com.example.hightrafficeventbookingsystem.model.User;
 import com.example.hightrafficeventbookingsystem.repository.UserRepository;
 import com.example.hightrafficeventbookingsystem.security.JwtService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +46,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token);
+        return issueTokenPair(user);
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -54,7 +57,32 @@ public class AuthService {
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token);
+        return issueTokenPair(user);
+    }
+
+    public AuthResponse refresh(RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+        final String username;
+
+        try {
+            username = jwtService.extractUsername(refreshToken);
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token", ex);
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        if (!jwtService.isRefreshTokenValid(refreshToken, user)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
+        }
+
+        return issueTokenPair(user);
+    }
+
+    private AuthResponse issueTokenPair(User user) {
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new AuthResponse(accessToken, refreshToken);
     }
 }
