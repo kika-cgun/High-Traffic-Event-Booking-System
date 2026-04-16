@@ -5,6 +5,8 @@ import com.example.hightrafficeventbookingsystem.dto.TicketResponse;
 import com.example.hightrafficeventbookingsystem.model.*;
 import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.repository.TicketRepository;
+import com.example.hightrafficeventbookingsystem.service.NotificationProducer;
+import com.example.hightrafficeventbookingsystem.service.RedisLockService;
 import com.example.hightrafficeventbookingsystem.service.ReservationEventProducer;
 import com.example.hightrafficeventbookingsystem.service.TicketService;
 import org.junit.jupiter.api.Test;
@@ -26,10 +28,18 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TicketServiceTest {
 
-    @Mock TicketRepository ticketRepository;
-    @Mock SeatRepository seatRepository;
-    @Mock ReservationEventProducer producer;
-    @InjectMocks TicketService ticketService;
+    @Mock
+    TicketRepository ticketRepository;
+    @Mock
+    SeatRepository seatRepository;
+    @Mock
+    RedisLockService redisLockService;
+    @Mock
+    NotificationProducer notificationProducer;
+    @Mock
+    ReservationEventProducer producer;
+    @InjectMocks
+    TicketService ticketService;
 
     private Ticket buildTicket(Long ticketId, User user, List<Seat> seats, Status status) {
         Ticket ticket = new Ticket();
@@ -59,15 +69,23 @@ class TicketServiceTest {
     @Test
     void confirmReservation_changesStatusToConfirmedAndPublishesKafkaEvent() {
         Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null, null, null);
-        Seat seat = Seat.builder().id(10L).seatNumber(5).rowNumber(2).section("A").event(event).reserved(true).build();
+        Seat seat = Seat.builder().id(10L).seatNumber(5).rowNumber(2).section("A").event(event).reserved(false).build();
         User user = new User(42L, "jan", "jan@test.com", "pass", null, null, null, null, Role.USER);
-        Ticket ticket = buildTicket(100L, user, List.of(seat), Status.RESERVED);
+        Ticket ticket = buildTicket(100L, user, List.of(), Status.RESERVED);
+        ticket.setEventId(1L);
+        ticket.setRequestedSeatIds("10");
 
         when(ticketRepository.findByIdWithSeatsAndEvent(100L)).thenReturn(Optional.of(ticket));
+        when(seatRepository.findAllByIdWithEvent(List.of(10L))).thenReturn(List.of(seat));
+        when(redisLockService.acquireLock(10L, 42L)).thenReturn(true);
 
         ticketService.confirmReservation(100L, 42L);
 
         assertThat(ticket.getStatus()).isEqualTo(Status.CONFIRMED);
+        assertThat(seat.isReserved()).isTrue();
+        verify(seatRepository).saveAll(List.of(seat));
+        verify(notificationProducer).sendTicketNotification(any());
+        verify(redisLockService).releaseLock(10L);
         ArgumentCaptor<ReservationEvent> captor = ArgumentCaptor.forClass(ReservationEvent.class);
         verify(producer).publish(captor.capture());
         assertThat(captor.getValue().action()).isEqualTo(ReservationEvent.ReservationAction.CONFIRMED);

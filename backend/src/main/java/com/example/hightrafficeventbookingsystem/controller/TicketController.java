@@ -38,7 +38,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.listMyTickets(user.getId()));
     }
 
-    @Operation(summary = "Confirm reservation")
+    @Operation(summary = "Simulate Pay Now and confirm reservation")
     @PostMapping("/{id}/confirm")
     public ResponseEntity<Void> confirmReservation(@PathVariable Long id, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -60,8 +60,8 @@ public class TicketController {
         User user = (User) authentication.getPrincipal();
         byte[] pdf = pdfTicketService.generatePdf(id, user.getId());
         return ResponseEntity.ok()
-            .header("Content-Disposition", "attachment; filename=\"bilet-" + id + ".pdf\"")
-            .header("Content-Type", "application/pdf")
-            .body(pdf);
+                .header("Content-Disposition", "attachment; filename=\"bilet-" + id + ".pdf\"")
+                .header("Content-Type", "application/pdf")
+                .body(pdf);
     }
 }

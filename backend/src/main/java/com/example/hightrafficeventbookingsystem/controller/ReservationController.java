@@ -24,28 +24,23 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "bearerAuth")
 public class ReservationController {
 
-    private final ReservationService reservationService;
+        private final ReservationService reservationService;
 
-    @Operation(
-            summary = "Reserve one or more seats for an event",
-            description = "Reserves the selected seats (multi-seat) for the authenticated user. All seats must belong to the same event. Uses Redis distributed locking per seat and enforces per-event booking limits."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reservation successful — returns ticket ID"),
-            @ApiResponse(responseCode = "400", description = "Invalid input — empty seatIds, seats belong to different events, or exceeds max seats per booking"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized — JWT token missing or invalid"),
-            @ApiResponse(responseCode = "404", description = "One or more seats or the user not found"),
-            @ApiResponse(responseCode = "409", description = "Already reserved — seat is taken or user already has an active ticket for this event"),
-            @ApiResponse(responseCode = "423", description = "Seat locked — seat is currently being reserved by another request, try again"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping
-    public ResponseEntity<String> makeReservation(
-            @Valid @RequestBody ReservationRequest request,
-            Authentication authentication
-    ) {
-        User currentUser = (User) authentication.getPrincipal();
-        Long ticketId = reservationService.reserveSeats(request.seatIds(), currentUser.getId());
-        return ResponseEntity.ok("Reservation successful. Ticket ID: " + ticketId);
-    }
+        @Operation(summary = "Create checkout for selected seats", description = "Creates a pending checkout ticket for selected seats. Final seat reservation happens on simulated Pay Now (ticket confirm endpoint).")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Checkout created — returns pending ticket ID"),
+                        @ApiResponse(responseCode = "400", description = "Invalid input — empty seatIds, seats belong to different events, or exceeds max seats per booking"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized — JWT token missing or invalid"),
+                        @ApiResponse(responseCode = "404", description = "One or more seats or the user not found"),
+                        @ApiResponse(responseCode = "409", description = "Already reserved — seat is taken or user already has an active ticket for this event"),
+                        @ApiResponse(responseCode = "500", description = "Internal server error")
+        })
+        @PostMapping
+        public ResponseEntity<String> makeReservation(
+                        @Valid @RequestBody ReservationRequest request,
+                        Authentication authentication) {
+                User currentUser = (User) authentication.getPrincipal();
+                Long ticketId = reservationService.reserveSeats(request.seatIds(), currentUser.getId());
+                return ResponseEntity.ok("Checkout created. Complete Pay Now to reserve seats. Ticket ID: " + ticketId);
+        }
 }

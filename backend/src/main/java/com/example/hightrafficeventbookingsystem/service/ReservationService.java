@@ -1,7 +1,5 @@
 package com.example.hightrafficeventbookingsystem.service;
 
-import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
-import com.example.hightrafficeventbookingsystem.dto.TicketCreatedEvent;
 import com.example.hightrafficeventbookingsystem.model.Event;
 import com.example.hightrafficeventbookingsystem.model.Seat;
 import com.example.hightrafficeventbookingsystem.model.Status;
@@ -18,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +27,6 @@ public class ReservationService {
     private final SeatRepository seatRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
-    private final RedisLockService redisLockService;
-    private final NotificationProducer notificationProducer;
-    private final ReservationEventProducer reservationEventProducer;
 
     @Transactional
     public Long reserveSeats(List<Long> seatIds, Long userId) {
@@ -58,79 +52,52 @@ public class ReservationService {
         // Enforce per-event seat limit
         if (event.getMaxSeatsPerBooking() != null && uniqueSeatIds.size() > event.getMaxSeatsPerBooking()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                "Cannot book more than " + event.getMaxSeatsPerBooking() + " seats for this event");
+                    "Cannot book more than " + event.getMaxSeatsPerBooking() + " seats for this event");
         }
 
-        // One active ticket per user per event
+        // One finalized reservation per user per event
         if (ticketRepository.existsActiveTicketForUserAndEvent(userId, event.getId(),
-                List.of(Status.RESERVED, Status.CONFIRMED))) {
+            List.of(Status.CONFIRMED))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                "You already have an active reservation for this event");
+                    "You already have an active reservation for this event");
         }
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Sort seats by ID to prevent deadlocks when acquiring locks in consistent order
-        seats = seats.stream().sorted(java.util.Comparator.comparing(Seat::getId)).toList();
-
-        // Acquire Redis locks for all seats
-        List<Long> locked = new ArrayList<>();
-        try {
-            for (Seat seat : seats) {
-                boolean acquired = redisLockService.acquireLock(seat.getId(), userId);
-                if (!acquired) {
-                    throw new ResponseStatusException(HttpStatus.LOCKED,
-                        "Seat " + seat.getId() + " is currently being reserved. Try again.");
-                }
-                locked.add(seat.getId());
-            }
-
-            // Verify none are already reserved (optimistic check after lock)
-            for (Seat seat : seats) {
-                if (seat.isReserved()) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+        // Seats already sold cannot be put in checkout.
+        for (Seat seat : seats) {
+            if (seat.isReserved()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Seat " + seat.getId() + " is already reserved");
-                }
             }
+        }
 
-            // Compute total price
-            BigDecimal total = seats.stream()
+        BigDecimal total = seats.stream()
                 .map(s -> s.getPrice() != null ? s.getPrice() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            // Create ticket
-            Ticket ticket = new Ticket();
+        String requestedSeatIds = uniqueSeatIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        // Reuse existing pending checkout for this event if present.
+        Ticket ticket = ticketRepository.findFirstByUserIdAndEventIdAndStatusOrderByCreatedAtDesc(
+            userId, event.getId(), Status.RESERVED
+        ).orElseGet(Ticket::new);
+
+        if (ticket.getId() == null) {
             ticket.setUser(user);
+            ticket.setEventId(event.getId());
             ticket.setStatus(Status.RESERVED);
-            ticket.setTotalPrice(total);
-            ticketRepository.save(ticket);
-
-            // Link seats to ticket and mark reserved
-            for (Seat seat : seats) {
-                seat.setReserved(true);
-                seat.setTicket(ticket);
-            }
-            seatRepository.saveAll(seats);
-
-            // RabbitMQ event (PDF generation + notification)
-            notificationProducer.sendTicketNotification(new TicketCreatedEvent(ticket.getId(), user.getEmail()));
-
-            // Kafka event per seat (WebSocket broadcast + audit log)
-            Instant now = Instant.now();
-            for (Seat seat : seats) {
-                ReservationEvent kafkaEvent = new ReservationEvent(
-                    ticket.getId(), user.getId(), seat.getId(), event.getId(),
-                    event.getName(), ReservationEvent.ReservationAction.RESERVED, now
-                );
-                reservationEventProducer.publish(kafkaEvent);
-            }
-
-            log.info("[Reservation] Ticket {} created for user {} — {} seat(s)", ticket.getId(), userId, seats.size());
-            return ticket.getId();
-
-        } finally {
-            locked.forEach(redisLockService::releaseLock);
         }
+
+        ticket.setRequestedSeatIds(requestedSeatIds);
+        ticket.setTotalPrice(total);
+        ticketRepository.save(ticket);
+
+        log.info("[Checkout] Pending ticket {} prepared for user {} — {} seat(s), awaiting Pay Now", ticket.getId(),
+            userId, seats.size());
+        return ticket.getId();
     }
 }

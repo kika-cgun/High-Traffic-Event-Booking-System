@@ -27,6 +27,17 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Event selected during checkout. Needed before seats are truly reserved.
+     */
+    private Long eventId;
+
+    /**
+     * Comma-separated seat IDs selected during checkout and finalized on Pay Now.
+     */
+    @Column(length = 1000)
+    private String requestedSeatIds;
+
     @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Seat> seats = new ArrayList<>();
@@ -46,4 +57,3 @@ public class Ticket {
     }
 
 }
-

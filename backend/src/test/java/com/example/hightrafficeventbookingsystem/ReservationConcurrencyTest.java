@@ -7,6 +7,7 @@ import com.example.hightrafficeventbookingsystem.repository.EventRepository;
 import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.repository.UserRepository;
 import com.example.hightrafficeventbookingsystem.service.ReservationService;
+import com.example.hightrafficeventbookingsystem.service.TicketService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,8 @@ class ReservationConcurrencyTest {
     static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:alpine"))
             .withExposedPorts(6379);
 
-    // Konfiguracja dynamiczna dla Redisa (Spring musi wiedzieć na jakim losowym porcie wstał Redis)
+    // Konfiguracja dynamiczna dla Redisa (Spring musi wiedzieć na jakim losowym
+    // porcie wstał Redis)
     @DynamicPropertySource
     static void redisProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", redis::getHost);
@@ -61,6 +63,8 @@ class ReservationConcurrencyTest {
 
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private TicketService ticketService;
     @Autowired
     private SeatRepository seatRepository;
     @Autowired
@@ -127,7 +131,8 @@ class ReservationConcurrencyTest {
                     latch.countDown();
                     latch.await();
 
-                    reservationService.reserveSeats(List.of(seatId), userId);
+                    Long ticketId = reservationService.reserveSeats(List.of(seatId), userId);
+                    ticketService.confirmReservation(ticketId, userId);
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {

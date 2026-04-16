@@ -23,19 +23,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = com.example.hightrafficeventbookingsystem.controller.EventController.class)
 class EventControllerTest {
 
-    @Autowired MockMvc mockMvc;
-    @MockitoBean EventService eventService;
-    @MockitoBean com.example.hightrafficeventbookingsystem.security.JwtService jwtService;
-    @MockitoBean com.example.hightrafficeventbookingsystem.service.UserService userService;
+    @Autowired
+    MockMvc mockMvc;
+    @MockitoBean
+    EventService eventService;
+    @MockitoBean
+    com.example.hightrafficeventbookingsystem.security.JwtService jwtService;
+    @MockitoBean
+    com.example.hightrafficeventbookingsystem.service.UserService userService;
 
     @Test
     void listEvents_isPublicAndReturns200() throws Exception {
-        EventResponse response = new EventResponse(1L, "Koncert", LocalDateTime.now().plusDays(1), VenueType.STADIUM, 4, 50L);
+        EventResponse response = new EventResponse(1L, "Koncert", LocalDateTime.now().plusDays(1), VenueType.STADIUM, 4,
+                "Ograniczenie biletowe: maksymalnie 4 na osobe", 50L);
         when(eventService.listEvents(any())).thenReturn(new PageImpl<>(List.of(response)));
 
         mockMvc.perform(get("/api/events"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Koncert"))
+                .andExpect(jsonPath("$.content[0].ticketLimitMessage")
+                        .value("Ograniczenie biletowe: maksymalnie 4 na osobe"))
                 .andExpect(jsonPath("$.content[0].availableSeats").value(50));
     }
 

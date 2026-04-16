@@ -27,7 +27,7 @@ public class EventService {
             long available = seatRepository.findByEventId(event.getId())
                     .stream().filter(s -> !s.isReserved()).count();
             return new EventResponse(event.getId(), event.getName(), event.getDate(),
-                    event.getVenueType(), event.getMaxSeatsPerBooking(), available);
+                    event.getVenueType(), event.getMaxSeatsPerBooking(), buildTicketLimitMessage(event), available);
         });
     }
 
@@ -37,7 +37,7 @@ public class EventService {
         long available = seatRepository.findByEventId(eventId).stream()
                 .filter(s -> !s.isReserved()).count();
         return new EventResponse(event.getId(), event.getName(), event.getDate(),
-                event.getVenueType(), event.getMaxSeatsPerBooking(), available);
+                event.getVenueType(), event.getMaxSeatsPerBooking(), buildTicketLimitMessage(event), available);
     }
 
     public List<SeatResponse> listSeats(Long eventId) {
@@ -52,7 +52,14 @@ public class EventService {
     private SeatResponse toSeatResponse(Seat seat) {
         return new SeatResponse(
                 seat.getId(), seat.getSeatNumber(), seat.getRowNumber(),
-                seat.getSection(), seat.getCategory(), seat.getPrice(), seat.isReserved()
-        );
+                seat.getSection(), seat.getCategory(), seat.getPrice(), seat.isReserved());
+    }
+
+    private String buildTicketLimitMessage(Event event) {
+        Integer limit = event.getMaxSeatsPerBooking();
+        if (limit == null || limit <= 0) {
+            return null;
+        }
+        return "Ograniczenie biletowe: maksymalnie " + limit + " na osobe";
     }
 }
