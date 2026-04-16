@@ -75,7 +75,8 @@ public class JwtService {
     private boolean hasExpectedTokenType(String token, String expectedTokenType) {
         String tokenType = extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class));
 
-        // Backward compatibility: old tokens without token_type are treated as access tokens.
+        // Backward compatibility: old tokens without token_type are treated as access
+        // tokens.
         if (tokenType == null) {
             return ACCESS_TOKEN_TYPE.equals(expectedTokenType);
         }
