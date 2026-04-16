@@ -47,11 +47,11 @@
 // SECTIONS ROW (horizontal layout)
 // ─────────────────────────────────────────────
 .sections-row {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: auto auto auto;
   align-items: flex-start;
   justify-content: center;
-  gap: 0;
+  row-gap: 3rem;
 }
 
 // ─────────────────────────────────────────────

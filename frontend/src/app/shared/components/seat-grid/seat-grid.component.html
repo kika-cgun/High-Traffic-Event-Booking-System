@@ -10,7 +10,7 @@
   <div class="sections-row">
     @for (sec of sections(); track sec.section; let i = $index) {
 
-      @if (i > 0) {
+      @if (i % 2 === 1) {
         <!-- Central corridor between sections -->
         <div class="aisle main-aisle">
           <span class="aisle-label">KORYTARZ</span>

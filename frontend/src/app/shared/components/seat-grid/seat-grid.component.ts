@@ -39,7 +39,9 @@ export class SeatGridComponent {
       if (!rows.has(seat.rowNumber)) rows.set(seat.rowNumber, []);
       rows.get(seat.rowNumber)!.push(seat);
     }
-    return Array.from(map.entries()).map(([section, rowMap]) => ({
+    return Array.from(map.entries())
+      .sort(([secA], [secB]) => secA.localeCompare(secB, undefined, { numeric: true }))
+      .map(([section, rowMap]) => ({
       section,
       rows: Array.from(rowMap.entries())
         .sort(([a], [b]) => a - b)
