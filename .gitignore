@@ -39,3 +39,8 @@ build/
 
 # Git worktrees
 .worktrees/
+
+# AI tooling — local only, never commit
+.superpowers/
+docs/superpowers/
+org/

@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,11 +31,21 @@ class TicketServiceTest {
     @Mock ReservationEventProducer producer;
     @InjectMocks TicketService ticketService;
 
+    private Ticket buildTicket(Long ticketId, User user, List<Seat> seats, Status status) {
+        Ticket ticket = new Ticket();
+        ticket.setId(ticketId);
+        ticket.setUser(user);
+        ticket.setStatus(status);
+        ticket.setCreatedAt(LocalDateTime.now());
+        ticket.getSeats().addAll(seats);
+        return ticket;
+    }
+
     @Test
     void listMyTickets_returnsMappedTickets() {
-        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null);
+        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null, null, null);
         Seat seat = Seat.builder().id(10L).seatNumber(5).rowNumber(2).section("A").event(event).reserved(true).build();
-        Ticket ticket = new Ticket(100L, null, seat, Status.RESERVED, null, LocalDateTime.now());
+        Ticket ticket = buildTicket(100L, null, List.of(seat), Status.RESERVED);
 
         when(ticketRepository.findByUserIdOrderByCreatedAtDesc(42L)).thenReturn(List.of(ticket));
 
@@ -47,12 +58,12 @@ class TicketServiceTest {
 
     @Test
     void confirmReservation_changesStatusToConfirmedAndPublishesKafkaEvent() {
-        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null);
+        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null, null, null);
         Seat seat = Seat.builder().id(10L).seatNumber(5).rowNumber(2).section("A").event(event).reserved(true).build();
         User user = new User(42L, "jan", "jan@test.com", "pass", null, null, null, null, Role.USER);
-        Ticket ticket = new Ticket(100L, user, seat, Status.RESERVED, null, LocalDateTime.now());
+        Ticket ticket = buildTicket(100L, user, List.of(seat), Status.RESERVED);
 
-        when(ticketRepository.findByIdWithSeatAndEvent(100L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdWithSeatsAndEvent(100L)).thenReturn(Optional.of(ticket));
 
         ticketService.confirmReservation(100L, 42L);
 
@@ -66,42 +77,42 @@ class TicketServiceTest {
     void confirmReservation_throwsWhenTicketBelongsToDifferentUser() {
         User owner = new User(99L, "other", "other@test.com", "pass", null, null, null, null, Role.USER);
         Seat seat = Seat.builder().id(10L).event(new Event()).reserved(true).build();
-        Ticket ticket = new Ticket(100L, owner, seat, Status.RESERVED, null, LocalDateTime.now());
+        Ticket ticket = buildTicket(100L, owner, List.of(seat), Status.RESERVED);
 
-        when(ticketRepository.findByIdWithSeatAndEvent(100L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdWithSeatsAndEvent(100L)).thenReturn(Optional.of(ticket));
 
         assertThatThrownBy(() -> ticketService.confirmReservation(100L, 42L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Ticket does not belong to this user");
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Access denied");
     }
 
     @Test
     void confirmReservation_throwsWhenTicketNotReserved() {
         User user = new User(42L, "jan", "jan@test.com", "pass", null, null, null, null, Role.USER);
         Seat seat = Seat.builder().id(10L).event(new Event()).reserved(false).build();
-        Ticket ticket = new Ticket(100L, user, seat, Status.CANCELLED, null, LocalDateTime.now());
+        Ticket ticket = buildTicket(100L, user, List.of(seat), Status.CANCELLED);
 
-        when(ticketRepository.findByIdWithSeatAndEvent(100L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdWithSeatsAndEvent(100L)).thenReturn(Optional.of(ticket));
 
         assertThatThrownBy(() -> ticketService.confirmReservation(100L, 42L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Only RESERVED tickets can be confirmed");
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Only RESERVED tickets can be confirmed");
     }
 
     @Test
     void cancelReservation_changesStatusAndReleasesSeat() {
-        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null);
+        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null, null, null);
         Seat seat = Seat.builder().id(10L).seatNumber(5).rowNumber(2).section("A").event(event).reserved(true).build();
         User user = new User(42L, "jan", "jan@test.com", "pass", null, null, null, null, Role.USER);
-        Ticket ticket = new Ticket(100L, user, seat, Status.RESERVED, null, LocalDateTime.now());
+        Ticket ticket = buildTicket(100L, user, List.of(seat), Status.RESERVED);
 
-        when(ticketRepository.findByIdWithSeatAndEvent(100L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdWithSeatsAndEvent(100L)).thenReturn(Optional.of(ticket));
 
         ticketService.cancelReservation(100L, 42L);
 
         assertThat(ticket.getStatus()).isEqualTo(Status.CANCELLED);
         assertThat(seat.isReserved()).isFalse();
-        verify(seatRepository).save(seat);
+        verify(seatRepository).saveAll(ticket.getSeats());
         ArgumentCaptor<ReservationEvent> captor = ArgumentCaptor.forClass(ReservationEvent.class);
         verify(producer).publish(captor.capture());
         assertThat(captor.getValue().action()).isEqualTo(ReservationEvent.ReservationAction.CANCELLED);

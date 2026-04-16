@@ -2,6 +2,7 @@ package com.example.hightrafficeventbookingsystem;
 
 import com.example.hightrafficeventbookingsystem.dto.EventResponse;
 import com.example.hightrafficeventbookingsystem.dto.SeatResponse;
+import com.example.hightrafficeventbookingsystem.model.VenueType;
 import com.example.hightrafficeventbookingsystem.service.EventService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,7 +30,7 @@ class EventControllerTest {
 
     @Test
     void listEvents_isPublicAndReturns200() throws Exception {
-        EventResponse response = new EventResponse(1L, "Koncert", LocalDateTime.now().plusDays(1), 50L);
+        EventResponse response = new EventResponse(1L, "Koncert", LocalDateTime.now().plusDays(1), VenueType.STADIUM, 4, 50L);
         when(eventService.listEvents(any())).thenReturn(new PageImpl<>(List.of(response)));
 
         mockMvc.perform(get("/api/events"))
@@ -39,7 +41,7 @@ class EventControllerTest {
 
     @Test
     void listSeats_isPublicAndReturns200() throws Exception {
-        SeatResponse seat = new SeatResponse(10L, 5, 2, "A", false);
+        SeatResponse seat = new SeatResponse(10L, 5, 2, "A", "STANDARD", new BigDecimal("50.00"), false);
         when(eventService.listSeats(1L)).thenReturn(List.of(seat));
 
         mockMvc.perform(get("/api/events/1/seats"))

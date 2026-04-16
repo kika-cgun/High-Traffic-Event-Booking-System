@@ -4,6 +4,7 @@ import com.example.hightrafficeventbookingsystem.dto.EventResponse;
 import com.example.hightrafficeventbookingsystem.dto.SeatResponse;
 import com.example.hightrafficeventbookingsystem.model.Event;
 import com.example.hightrafficeventbookingsystem.model.Seat;
+import com.example.hightrafficeventbookingsystem.model.VenueType;
 import com.example.hightrafficeventbookingsystem.repository.EventRepository;
 import com.example.hightrafficeventbookingsystem.repository.SeatRepository;
 import com.example.hightrafficeventbookingsystem.service.EventService;
@@ -33,7 +34,7 @@ class EventServiceTest {
 
     @Test
     void listEvents_returnsMappedPage() {
-        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), null);
+        Event event = new Event(1L, "Koncert", LocalDateTime.now().plusDays(5), VenueType.CINEMA, 8, null);
         when(eventRepository.findAll(any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(List.of(event)));
         when(seatRepository.findByEventId(1L)).thenReturn(List.of());

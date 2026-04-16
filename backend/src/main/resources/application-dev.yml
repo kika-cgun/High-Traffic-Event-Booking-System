@@ -1,7 +1,26 @@
-# Ustawienia deweloperskie — show-sql aktywne tylko lokalnie
+# Ustawienia deweloperskie — Docker Compose zarządzany ręcznie przez dewelopera
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
+  docker:
+    compose:
+      enabled: false  # Uruchamiaj `docker compose up -d` ręcznie przed startem aplikacji
+
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_DEFAULT_USER:guest}
+    password: ${RABBITMQ_DEFAULT_PASS:guest}

@@ -23,6 +23,11 @@ public class Event {
 
     private LocalDateTime date;
 
+    @Enumerated(EnumType.STRING)
+    private VenueType venueType;
+
+    private Integer maxSeatsPerBooking;
+
     private Long venueId;
 
 }

@@ -33,8 +33,8 @@ public class ReservationCleanupService {
 
         LocalDateTime cutoffDateTime = LocalDateTime.now().minusMinutes(15);
 
-        // JOIN FETCH avoids N+1; PageRequest caps batch size to prevent OOM
-        List<Ticket> expiredTickets = ticketRepository.findExpiredWithSeat(
+        // PageRequest caps batch size to prevent OOM
+        List<Ticket> expiredTickets = ticketRepository.findExpired(
                 Status.RESERVED, cutoffDateTime, PageRequest.of(0, BATCH_SIZE));
 
         if (expiredTickets.isEmpty()) {
@@ -47,13 +47,14 @@ public class ReservationCleanupService {
         for (Ticket ticket : expiredTickets) {
             ticket.setStatus(Status.CANCELLED);
 
-            Seat seat = ticket.getSeat(); // already fetched via JOIN FETCH — no extra query
-            seat.setReserved(false);
-            seatRepository.save(seat);
+            for (Seat seat : ticket.getSeats()) {
+                seat.setReserved(false);
+                seatRepository.save(seat);
 
-            redisLockService.releaseLock(seat.getId());
+                redisLockService.releaseLock(seat.getId());
 
-            log.info("Cancelled ticket ID {} and released seat ID {}", ticket.getId(), seat.getId());
+                log.info("Cancelled ticket ID {} and released seat ID {}", ticket.getId(), seat.getId());
+            }
         }
 
         ticketRepository.saveAll(expiredTickets);
