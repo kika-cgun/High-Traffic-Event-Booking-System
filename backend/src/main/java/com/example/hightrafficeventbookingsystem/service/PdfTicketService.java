@@ -41,7 +41,7 @@ public class PdfTicketService {
     private final TicketRepository ticketRepository;
 
     private static final DateTimeFormatter DATE_FMT =
-        DateTimeFormatter.ofPattern("EEE, d MMM yyyy - HH:mm", new Locale("pl", "PL"));
+        DateTimeFormatter.ofPattern("EEE, d MMM yyyy - HH:mm", new Locale("en", "US"));
 
     @Transactional(readOnly = true)
     public byte[] generatePdf(Long ticketId, Long userId) {
@@ -140,16 +140,16 @@ public class PdfTicketService {
                 cs.setFont(fontBold, 12);
                 cs.setNonStrokingColor(0.1f, 0.1f, 0.18f);
                 cs.newLineAtOffset(margin, y);
-                cs.showText("Twoje miejsca:");
+                cs.showText("Your seats:");
                 cs.endText();
                 y -= 18;
 
                 // Each seat line
                 for (Seat seat : seats) {
                     String line = "* " + asciify(safeStr(seat.getCategory()))
-                        + "  -  Rzad " + seat.getRowNumber()
-                        + "  -  Miejsce " + seat.getSeatNumber()
-                        + "  -  Sekcja " + asciify(safeStr(seat.getSection()))
+                        + "  -  Row " + seat.getRowNumber()
+                        + "  -  Seat " + seat.getSeatNumber()
+                        + "  -  Section " + asciify(safeStr(seat.getSection()))
                         + "  -  " + formatPrice(seat.getPrice()) + " PLN";
 
                     cs.beginText();
@@ -168,7 +168,7 @@ public class PdfTicketService {
                 cs.setFont(fontBold, 13);
                 cs.setNonStrokingColor(0.1f, 0.1f, 0.18f);
                 cs.newLineAtOffset(margin, y);
-                cs.showText("Lacznie: " + formatPrice(ticket.getTotalPrice()) + " PLN");
+                cs.showText("Total: " + formatPrice(ticket.getTotalPrice()) + " PLN");
                 cs.endText();
                 y -= 30;
 
@@ -192,7 +192,7 @@ public class PdfTicketService {
                 cs.setFont(fontBold, 12);
                 cs.setNonStrokingColor(0.1f, 0.1f, 0.18f);
                 cs.newLineAtOffset(infoX, infoY);
-                cs.showText("Bilet #" + ticket.getId());
+                cs.showText("Ticket #" + ticket.getId());
                 cs.endText();
                 infoY -= 18;
 
@@ -208,7 +208,7 @@ public class PdfTicketService {
                 cs.setFont(fontReg, 9);
                 cs.setNonStrokingColor(0.5f, 0.5f, 0.6f);
                 cs.newLineAtOffset(infoX, infoY);
-                cs.showText("Wygenerowano: " + LocalDateTime.now().format(
+                cs.showText("Generated: " + LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                 cs.endText();
 
@@ -235,9 +235,9 @@ public class PdfTicketService {
     private String friendlyVenueType(VenueType vt) {
         if (vt == null) return "";
         return switch (vt) {
-            case CINEMA -> "Kino";
-            case STADIUM -> "Stadion";
-            case CONCERT_ARENA -> "Arena koncertowa";
+            case CINEMA -> "Cinema";
+            case STADIUM -> "Stadium";
+            case CONCERT_ARENA -> "Concert Arena";
         };
     }
 

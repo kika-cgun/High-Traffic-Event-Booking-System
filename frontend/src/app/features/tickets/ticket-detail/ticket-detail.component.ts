@@ -44,7 +44,7 @@ export class TicketDetailComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Nie znaleziono biletu.', 'OK', { duration: 3000 });
+        this.snackBar.open('Ticket not found.', 'OK', { duration: 3000 });
         this.router.navigate(['/tickets']);
       },
     });
@@ -62,7 +62,7 @@ export class TicketDetailComponent implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `bilet-${id}.pdf`;
+        a.download = `ticket-${id}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -71,7 +71,7 @@ export class TicketDetailComponent implements OnInit {
       },
       error: () => {
         this.downloadingPdf.set(false);
-        this.snackBar.open('Błąd pobierania biletu.', 'OK', { duration: 3000 });
+        this.snackBar.open('Ticket download error.', 'OK', { duration: 3000 });
       }
     });
   }
@@ -84,7 +84,7 @@ export class TicketDetailComponent implements OnInit {
       next: () => {
         this.ticket.update(t => t ? { ...t, status: 'CANCELLED' } : t);
         this.cancelling.set(false);
-        this.snackBar.open('Rezerwacja anulowana.', 'OK', { duration: 3000 });
+        this.snackBar.open('Booking cancelled.', 'OK', { duration: 3000 });
       },
       error: () => {
         this.cancelling.set(false);

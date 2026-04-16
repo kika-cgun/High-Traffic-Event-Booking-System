@@ -75,9 +75,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       error: err => {
         this.reserving.set(false);
         const msg =
-          err.status === 409 ? 'Jedno z miejsc jest juz zajete. Wybierz inne.' :
-          err.status === 423 ? 'Miejsce jest aktualnie rezerwowane. Sprobuj ponownie.' :
-          'Rezerwacja nieudana. Sprobuj ponownie.';
+          err.status === 409 ? 'One of the seats is already taken. Choose another.' :
+          err.status === 423 ? 'Seat is currently reserved. Please try again.' :
+          'Booking failed. Please try again.';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });

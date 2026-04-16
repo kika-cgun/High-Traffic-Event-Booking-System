@@ -1,7 +1,7 @@
 <div class="pit-selector">
   <div class="pit-icon">🎤</div>
-  <h3 class="pit-title">Strefa PIT</h3>
-  <p class="pit-desc">Stojace miejsca przy scenie. Wybierz liczbe wejsciowek.</p>
+  <h3 class="pit-title">PIT Zone</h3>
+  <p class="pit-desc">Standing area by the stage. Select number of passes.</p>
 
   <div class="counter">
     <button mat-icon-button (click)="decrement()" [disabled]="count() === 0">
@@ -14,12 +14,12 @@
   </div>
 
   <p class="price-info">
-    {{ pricePerSeat() | currency:'PLN':'symbol':'1.2-2':'pl' }} / os.
+    {{ pricePerSeat() | currency:'PLN':'symbol':'1.2-2':'en' }} / person
     &nbsp;&middot;&nbsp;
-    Lacznie: {{ total() | currency:'PLN':'symbol':'1.2-2':'pl' }}
+    Total: {{ total() | currency:'PLN':'symbol':'1.2-2':'en' }}
   </p>
 
   <button mat-flat-button color="primary" [disabled]="count() === 0" (click)="reserve()">
-    Zarezerwuj {{ count() }} wejsciowek PIT
+    Reserve {{ count() }} PIT passes
   </button>
 </div>

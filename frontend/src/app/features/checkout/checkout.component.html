@@ -11,21 +11,21 @@
 
       @case ('ready') {
         <div class="checkout-content">
-          <h1>Potwierdź rezerwację</h1>
+          <h1>Confirm booking</h1>
 
           <div class="ticket-summary">
             <div class="summary-row">
-              <span class="label">Wydarzenie</span>
+              <span class="label">Event</span>
               <span class="value">{{ ticket()!.eventName }}</span>
             </div>
             <mat-divider />
             
             <div class="summary-row seats-list-row">
-              <span class="label">Wybrane miejsca ({{ ticket()!.seats.length }})</span>
+              <span class="label">Selected seats ({{ ticket()!.seats.length }})</span>
               <ul class="seats-list">
                 @for (seat of ticket()!.seats; track seat.id) {
                   <li>
-                    Sekcja {{ seat.section }}, Rząd {{ seat.rowNumber }}, Miejsce {{ seat.seatNumber }}
+                    Section {{ seat.section }}, Row {{ seat.rowNumber }}, Seat {{ seat.seatNumber }}
                     <span class="seat-price">{{ seat.price }} PLN</span>
                   </li>
                 }
@@ -34,14 +34,14 @@
             <mat-divider />
             
             <div class="summary-row price-row">
-              <span class="label">Łącznie</span>
+              <span class="label">Total</span>
               <span class="price">{{ ticket()!.totalPrice }} PLN</span>
             </div>
           </div>
 
           <button mat-raised-button color="primary" class="pay-btn" (click)="pay()">
             <mat-icon>credit_card</mat-icon>
-            Zapłać — {{ ticket()!.totalPrice }} PLN
+            Pay — {{ ticket()!.totalPrice }} PLN
           </button>
         </div>
       }
@@ -49,21 +49,21 @@
       @case ('paying') {
         <div class="center">
           <mat-spinner diameter="48" />
-          <p class="paying-text">Przetwarzanie płatności…</p>
+          <p class="paying-text">Processing payment…</p>
         </div>
       }
 
       @case ('success') {
         <div class="success-screen">
           <mat-icon class="success-icon">check_circle</mat-icon>
-          <h2>Rezerwacja potwierdzona!</h2>
-          <p>Twoje zamówienie nr {{ ticketId }} zostało pomyślnie zrealizowane.</p>
+          <h2>Booking confirmed!</h2>
+          <p>Your order #{{ ticketId }} has been completed successfully.</p>
           <div class="success-actions">
             <a mat-raised-button color="primary" routerLink="/tickets">
               <mat-icon>confirmation_number</mat-icon>
-              Przejdź do moich biletów
+              Go to my tickets
             </a>
-            <a mat-button routerLink="/events">Przeglądaj inne wydarzenia</a>
+            <a mat-button routerLink="/events">Browse other events</a>
           </div>
         </div>
       }
@@ -71,8 +71,8 @@
       @case ('error') {
         <div class="center error-screen">
           <mat-icon class="error-icon">error_outline</mat-icon>
-          <p>Coś poszło nie tak. Spróbuj ponownie.</p>
-          <a mat-button routerLink="/events">Wróć do wydarzeń</a>
+          <p>Something went wrong. Please try again.</p>
+          <a mat-button routerLink="/events">Back to events</a>
         </div>
       }
 

@@ -2,9 +2,9 @@
   <div class="section-view">
     <button mat-button (click)="back()">
       <mat-icon>arrow_back</mat-icon>
-      Powrót do mapy
+      Back to map
     </button>
-    <h3 class="section-title">Trybuna {{ selectedSection() }}</h3>
+    <h3 class="section-title">Stand {{ selectedSection() }}</h3>
     <app-seat-grid
       [seats]="sectionSeats()"
       [maxSeats]="maxSeats()"
@@ -23,8 +23,8 @@
           <button class="sector-btn sector--N"
             [class.sold-out]="sectionAvailability()[section]?.available === 0"
             (click)="selectSection(section)">
-            <span class="sector-name">Trybuna N</span>
-            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+            <span class="sector-name">Stand N</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} available</span>
           </button>
         }
       }
@@ -35,8 +35,8 @@
           <button class="sector-btn sector--W"
             [class.sold-out]="sectionAvailability()[section]?.available === 0"
             (click)="selectSection(section)">
-            <span class="sector-name">Trybuna W</span>
-            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+            <span class="sector-name">Stand W</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} available</span>
           </button>
         }
       }
@@ -96,8 +96,8 @@
           <button class="sector-btn sector--E"
             [class.sold-out]="sectionAvailability()[section]?.available === 0"
             (click)="selectSection(section)">
-            <span class="sector-name">Trybuna E</span>
-            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+            <span class="sector-name">Stand E</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} available</span>
           </button>
         }
       }
@@ -108,8 +108,8 @@
           <button class="sector-btn sector--S"
             [class.sold-out]="sectionAvailability()[section]?.available === 0"
             (click)="selectSection(section)">
-            <span class="sector-name">Trybuna S</span>
-            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+            <span class="sector-name">Stand S</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} available</span>
           </button>
         }
       }
@@ -120,8 +120,8 @@
           <button class="sector-btn sector--other"
             [class.sold-out]="sectionAvailability()[section]?.available === 0"
             (click)="selectSection(section)">
-            <span class="sector-name">Trybuna {{ section }}</span>
-            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+            <span class="sector-name">Stand {{ section }}</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} available</span>
           </button>
         }
       }

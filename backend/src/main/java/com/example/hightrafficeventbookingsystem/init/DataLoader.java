@@ -111,12 +111,12 @@ public class DataLoader implements CommandLineRunner {
             seats.add(seat);
         }
 
-        addSection(seats, event, "Parter L", 2, 20, "STANDARD", new BigDecimal("150"));
-        addSection(seats, event, "Parter R", 2, 20, "STANDARD", new BigDecimal("150"));
-        addSection(seats, event, "Trybuna Główna", 3, 10, "PREMIUM", new BigDecimal("300"));
-        addSection(seats, event, "Balkon L", 2, 15, "BALKON", new BigDecimal("80"));
-        addSection(seats, event, "Balkon R", 2, 15, "BALKON", new BigDecimal("80"));
-        addSection(seats, event, "Górna Trybuna", 2, 10, "STANDARD", new BigDecimal("100"));
+        addSection(seats, event, "Floor L", 2, 20, "STANDARD", new BigDecimal("150"));
+        addSection(seats, event, "Floor R", 2, 20, "STANDARD", new BigDecimal("150"));
+        addSection(seats, event, "Main Stand", 3, 10, "PREMIUM", new BigDecimal("300"));
+        addSection(seats, event, "Balcony L", 2, 15, "BALKON", new BigDecimal("80"));
+        addSection(seats, event, "Balcony R", 2, 15, "BALKON", new BigDecimal("80"));
+        addSection(seats, event, "Upper Stand", 2, 10, "STANDARD", new BigDecimal("100"));
 
         seatRepository.saveAll(seats);
         log.info("CONCERT_ARENA '{}': {} seats created", name, seats.size());

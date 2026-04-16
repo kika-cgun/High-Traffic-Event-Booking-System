@@ -73,7 +73,7 @@ export class SeatGridComponent {
       current.delete(seat.id);
     } else {
       if (current.size >= this.maxSeats()) {
-        this.snackBar.open(`Osiagnięto limit ${this.maxSeats()} miejsc`, 'OK', { duration: 3000 });
+        this.snackBar.open(`Seat limit of ${this.maxSeats()} reached`, 'OK', { duration: 3000 });
         return;
       }
       current.add(seat.id);

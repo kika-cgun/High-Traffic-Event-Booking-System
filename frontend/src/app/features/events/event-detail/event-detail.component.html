@@ -1,7 +1,7 @@
 <div class="page-container">
   <a class="back-link" (click)="router.navigate(['/events'])">
     <mat-icon>arrow_back</mat-icon>
-    Wszystkie eventy
+    All events
   </a>
 
   @if (loading()) {
@@ -10,16 +10,16 @@
     </div>
   } @else {
     <header class="event-header">
-      <h1>{{ event()?.name ?? 'Wybierz miejsca' }}</h1>
+      <h1>{{ event()?.name ?? 'Choose seats' }}</h1>
       <p class="seat-hint">
-        Zaznacz miejsca (maks. {{ event()?.maxSeatsPerBooking ?? 10 }}) i kliknij Zarezerwuj.
+        Select seats (max {{ event()?.maxSeatsPerBooking ?? 10 }}) and click Reserve.
       </p>
     </header>
 
     @if (reserving()) {
       <div class="reserving-overlay">
         <mat-spinner diameter="28" />
-        <span>Rezerwowanie...</span>
+        <span>Reserving...</span>
       </div>
     }
 

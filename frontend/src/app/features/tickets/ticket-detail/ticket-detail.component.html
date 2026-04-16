@@ -1,7 +1,7 @@
 <div class="page-container">
   <a class="back-link" routerLink="/tickets">
     <mat-icon>arrow_back</mat-icon>
-    Moje bilety
+    My tickets
   </a>
 
   @if (loading()) {
@@ -17,20 +17,20 @@
             {{ ticket()!.status }}
           </mat-chip>
         </div>
-        <p class="event-date">{{ ticket()!.eventDate | date:'EEEE, d MMMM yyyy, HH:mm':'':'pl' }}</p>
+        <p class="event-date">{{ ticket()!.eventDate | date:'EEEE, d MMMM yyyy, HH:mm':'':'en' }}</p>
         <p class="venue-type">{{ ticket()!.venueType }}</p>
       </header>
 
       <section class="seats-section">
-        <h2>Twoje miejsca</h2>
+        <h2>Your seats</h2>
         <table class="seats-table">
           <thead>
             <tr>
-              <th>Sekcja</th>
-              <th>Rzad</th>
-              <th>Miejsce</th>
-              <th>Kategoria</th>
-              <th>Cena</th>
+              <th>Section</th>
+              <th>Row</th>
+              <th>Seat</th>
+              <th>Category</th>
+              <th>Price</th>
             </tr>
           </thead>
           <tbody>
@@ -40,13 +40,13 @@
                 <td>{{ seat.rowNumber }}</td>
                 <td>{{ seat.seatNumber }}</td>
                 <td>{{ seat.category }}</td>
-                <td>{{ seat.price | currency:'PLN':'symbol':'1.2-2':'pl' }}</td>
+                <td>{{ seat.price | currency:'PLN':'symbol':'1.2-2':'en' }}</td>
               </tr>
             }
           </tbody>
         </table>
         <p class="total-price">
-          Lacznie: <strong>{{ ticket()!.totalPrice | currency:'PLN':'symbol':'1.2-2':'pl' }}</strong>
+          Total: <strong>{{ ticket()!.totalPrice | currency:'PLN':'symbol':'1.2-2':'en' }}</strong>
         </p>
       </section>
 
@@ -57,7 +57,7 @@
           } @else {
             <mat-icon>download</mat-icon>
           }
-          Pobierz PDF
+          Download PDF
         </button>
         @if (canCancel()) {
           <button mat-stroked-button color="warn" [disabled]="cancelling()" (click)="cancel()">
@@ -66,7 +66,7 @@
             } @else {
               <mat-icon>cancel</mat-icon>
             }
-            Anuluj rezerwacje
+            Cancel booking
           </button>
         }
       </div>
