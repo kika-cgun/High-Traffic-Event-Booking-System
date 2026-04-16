@@ -34,4 +34,8 @@ export class TicketService {
   cancelTicket(ticketId: number): Observable<void> {
     return this.http.delete<void>(`/api/tickets/${ticketId}`);
   }
+
+  downloadPdf(ticketId: number): Observable<Blob> {
+    return this.http.get(`/api/tickets/${ticketId}/pdf`, { responseType: 'blob' });
+  }
 }

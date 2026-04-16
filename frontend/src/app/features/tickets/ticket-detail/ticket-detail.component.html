@@ -51,8 +51,12 @@
       </section>
 
       <div class="actions">
-        <button mat-flat-button color="primary" (click)="downloadPdf()">
-          <mat-icon>download</mat-icon>
+        <button mat-flat-button color="primary" [disabled]="downloadingPdf()" (click)="downloadPdf()">
+          @if (downloadingPdf()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            <mat-icon>download</mat-icon>
+          }
           Pobierz PDF
         </button>
         @if (canCancel()) {

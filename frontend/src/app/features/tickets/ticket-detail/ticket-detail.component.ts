@@ -50,10 +50,30 @@ export class TicketDetailComponent implements OnInit {
     });
   }
 
+  protected downloadingPdf = signal(false);
+
   protected downloadPdf(): void {
     const id = this.ticket()?.id;
     if (!id) return;
-    window.open(`/api/tickets/${id}/pdf`, '_blank');
+    
+    this.downloadingPdf.set(true);
+    this.ticketService.downloadPdf(id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bilet-${id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.downloadingPdf.set(false);
+      },
+      error: () => {
+        this.downloadingPdf.set(false);
+        this.snackBar.open('Błąd pobierania biletu.', 'OK', { duration: 3000 });
+      }
+    });
   }
 
   protected cancel(): void {

@@ -57,7 +57,7 @@ public class ReservationService {
 
         // One finalized reservation per user per event
         if (ticketRepository.existsActiveTicketForUserAndEvent(userId, event.getId(),
-            List.of(Status.CONFIRMED))) {
+                List.of(Status.CONFIRMED))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "You already have an active reservation for this event");
         }
@@ -83,8 +83,7 @@ public class ReservationService {
 
         // Reuse existing pending checkout for this event if present.
         Ticket ticket = ticketRepository.findFirstByUserIdAndEventIdAndStatusOrderByCreatedAtDesc(
-            userId, event.getId(), Status.RESERVED
-        ).orElseGet(Ticket::new);
+                userId, event.getId(), Status.RESERVED).orElseGet(Ticket::new);
 
         if (ticket.getId() == null) {
             ticket.setUser(user);
@@ -97,7 +96,7 @@ public class ReservationService {
         ticketRepository.save(ticket);
 
         log.info("[Checkout] Pending ticket {} prepared for user {} — {} seat(s), awaiting Pay Now", ticket.getId(),
-            userId, seats.size());
+                userId, seats.size());
         return ticket.getId();
     }
 }
