@@ -33,6 +33,30 @@
   }
 }
 
+.mobile-icon {
+  display: none;
+  margin-right: 4px;
+}
+
+@media (max-width: 600px) {
+  .nav-text {
+    display: none;
+  }
+  .mobile-icon {
+    display: inline-block;
+  }
+  .app-toolbar {
+    padding: 0 8px;
+  }
+  .brand {
+    font-size: 1.1rem;
+  }
+  .nav-links a.mat-mdc-button, .nav-links button.mat-mdc-button {
+    min-width: 48px;
+    padding: 0 8px;
+  }
+}
+
 main {
   min-height: calc(100vh - 64px);
 }

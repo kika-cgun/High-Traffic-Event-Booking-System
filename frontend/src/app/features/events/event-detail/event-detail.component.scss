@@ -38,6 +38,18 @@
   }
 }
 
+@media (max-width: 600px) {
+  .event-header {
+    margin-bottom: 1.5rem;
+    h1 {
+      font-size: 1.8rem;
+    }
+    .seat-hint {
+      font-size: 0.9rem;
+    }
+  }
+}
+
 .reserving-overlay {
   display: flex;
   align-items: center;

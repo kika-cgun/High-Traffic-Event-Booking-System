@@ -7,13 +7,19 @@
   <span class="spacer"></span>
 
   <nav class="nav-links">
-    <a mat-button routerLink="/events" routerLinkActive="active-link">Events</a>
+    <a mat-button routerLink="/events" routerLinkActive="active-link">
+      <mat-icon class="mobile-icon">event</mat-icon>
+      <span class="nav-text">Events</span>
+    </a>
 
     @if (authService.isLoggedIn()) {
-      <a mat-button routerLink="/tickets" routerLinkActive="active-link">My Tickets</a>
+      <a mat-button routerLink="/tickets" routerLinkActive="active-link">
+        <mat-icon class="mobile-icon">confirmation_number</mat-icon>
+        <span class="nav-text">My Tickets</span>
+      </a>
       <button mat-button (click)="authService.logout()">
         <mat-icon>logout</mat-icon>
-        Logout
+        <span class="nav-text">Logout</span>
       </button>
     } @else {
       <a mat-button routerLink="/login">Login</a>

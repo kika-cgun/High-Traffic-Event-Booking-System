@@ -1,5 +1,12 @@
+.arena-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .arena-svg-wrapper {
   width: 100%;
+  min-width: 600px;
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;

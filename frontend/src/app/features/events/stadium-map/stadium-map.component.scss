@@ -2,10 +2,15 @@
 // STADIUM WRAPPER
 // ─────────────────────────────────────────────
 .stadium-map-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1.5rem 0 2rem;
+  width: 100%;
+}
+
+.stadium-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1rem;
 }
 
 // ─────────────────────────────────────────────
@@ -28,6 +33,8 @@
   gap: 8px;
   align-items: stretch;
   justify-items: stretch;
+  min-width: 560px;
+  margin: 0 auto;
 }
 
 // ─────────────────────────────────────────────

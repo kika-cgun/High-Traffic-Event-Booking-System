@@ -1,58 +1,62 @@
 <div class="grid-wrapper">
 
-  <!-- STAGE / SCREEN -->
-  <div class="stage-wrap">
-    <div class="stage">STAGE</div>
-    <div class="stage-shadow"></div>
-  </div>
-
-  <!-- SEAT MAP -->
-  <div class="sections-row">
-    @for (sec of sections(); track sec.section; let i = $index) {
-
-      @if (i % 2 === 1) {
-        <!-- Central corridor between sections -->
-        <div class="aisle main-aisle">
-          <span class="aisle-label">AISLE</span>
-        </div>
-      }
-
-      <div class="section">
-        <div class="section-badge">Section {{ sec.section }}</div>
-
-        @for (row of sec.rows; track row.rowNumber) {
-          <div class="seat-row">
-            <!-- Row number — left -->
-            <span class="row-num">{{ row.rowNumber }}</span>
-
-            <!-- Seats split into two halves with inner gap -->
-            @for (seat of row.seats; track seat.id; let si = $index) {
-              @if (si > 0 && si === (row.seats.length / 2)) {
-                <div class="inner-gap"></div>
-              }
-              <button
-                class="seat-btn"
-                [class.available]="!seat.reserved && !isSelected(seat)"
-                [class.selected]="isSelected(seat)"
-                [class.reserved]="seat.reserved"
-                [disabled]="seat.reserved"
-                [matTooltip]="seat.reserved
-                  ? 'Reserved'
-                  : (isSelected(seat)
-                    ? 'Click to unselect'
-                    : 'Row ' + seat.rowNumber + ', Seat ' + seat.seatNumber + ' — ' + seat.price + ' PLN')"
-                (click)="toggle(seat)">
-                {{ seat.seatNumber }}
-              </button>
-            }
-
-            <!-- Row number — right -->
-            <span class="row-num row-num--right">{{ row.rowNumber }}</span>
-          </div>
-        }
+  <div class="map-scroll-container">
+    <div class="map-content">
+      <!-- STAGE / SCREEN -->
+      <div class="stage-wrap">
+        <div class="stage">STAGE</div>
+        <div class="stage-shadow"></div>
       </div>
 
-    }
+      <!-- SEAT MAP -->
+      <div class="sections-row">
+        @for (sec of sections(); track sec.section; let i = $index) {
+
+          @if (i % 2 === 1) {
+            <!-- Central corridor between sections -->
+            <div class="aisle main-aisle">
+              <span class="aisle-label">AISLE</span>
+            </div>
+          }
+
+          <div class="section">
+            <div class="section-badge">Section {{ sec.section }}</div>
+
+            @for (row of sec.rows; track row.rowNumber) {
+              <div class="seat-row">
+                <!-- Row number — left -->
+                <span class="row-num">{{ row.rowNumber }}</span>
+
+                <!-- Seats split into two halves with inner gap -->
+                @for (seat of row.seats; track seat.id; let si = $index) {
+                  @if (si > 0 && si === (row.seats.length / 2)) {
+                    <div class="inner-gap"></div>
+                  }
+                  <button
+                    class="seat-btn"
+                    [class.available]="!seat.reserved && !isSelected(seat)"
+                    [class.selected]="isSelected(seat)"
+                    [class.reserved]="seat.reserved"
+                    [disabled]="seat.reserved"
+                    [matTooltip]="seat.reserved
+                      ? 'Reserved'
+                      : (isSelected(seat)
+                        ? 'Click to unselect'
+                        : 'Row ' + seat.rowNumber + ', Seat ' + seat.seatNumber + ' — ' + seat.price + ' PLN')"
+                    (click)="toggle(seat)">
+                    {{ seat.seatNumber }}
+                  </button>
+                }
+
+                <!-- Row number — right -->
+                <span class="row-num row-num--right">{{ row.rowNumber }}</span>
+              </div>
+            }
+          </div>
+
+        }
+      </div>
+    </div>
   </div>
 
   <!-- LEGEND -->

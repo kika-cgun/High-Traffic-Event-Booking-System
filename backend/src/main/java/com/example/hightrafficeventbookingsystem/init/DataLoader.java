@@ -130,12 +130,12 @@ public class DataLoader implements CommandLineRunner {
         event.setMaxSeatsPerBooking(maxSeats);
         eventRepository.save(event);
 
-        String[] sections = {"A", "B", "C", "D", "E"};
+        String[] sections = {"A", "B", "C", "D"};
         BigDecimal[] prices = {
             new BigDecimal("30"), new BigDecimal("40"), new BigDecimal("50"),
-            new BigDecimal("50"), new BigDecimal("60")
+            new BigDecimal("50")
         };
-        String[] categories = {"STANDARD", "STANDARD", "PREMIUM", "PREMIUM", "VIP"};
+        String[] categories = {"STANDARD", "STANDARD", "PREMIUM", "PREMIUM"};
 
         List<Seat> seats = new ArrayList<>();
         for (int si = 0; si < sections.length; si++) {
