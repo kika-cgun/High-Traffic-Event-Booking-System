@@ -22,7 +22,8 @@ import java.util.Map;
 public class KafkaConfig {
 
     public static final String RESERVATION_EVENTS_TOPIC = "reservation-events";
-    public static final String AUDIT_CONSUMER_GROUP    = "booking-audit";
+    public static final String AUDIT_CONSUMER_GROUP = "booking-audit";
+    public static final String WS_CONSUMER_GROUP = "booking-ws";
 
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
@@ -32,8 +33,8 @@ public class KafkaConfig {
     @Bean
     public NewTopic reservationEventsTopic() {
         return TopicBuilder.name(RESERVATION_EVENTS_TOPIC)
-                .partitions(3)          // 3 partycje → równoległa konsumpcja
-                .replicas(1)            // 1 replika (single-node dev/demo)
+                .partitions(3) // 3 partycje → równoległa konsumpcja
+                .replicas(1) // 1 replika (single-node dev/demo)
                 .build();
     }
 
@@ -78,8 +79,7 @@ public class KafkaConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ReservationEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ReservationEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, ReservationEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(reservationEventConsumerFactory());
         return factory;
     }

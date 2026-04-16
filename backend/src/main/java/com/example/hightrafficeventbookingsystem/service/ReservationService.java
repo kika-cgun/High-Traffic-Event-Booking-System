@@ -1,5 +1,6 @@
 package com.example.hightrafficeventbookingsystem.service;
 
+import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
 import com.example.hightrafficeventbookingsystem.model.Event;
 import com.example.hightrafficeventbookingsystem.model.Seat;
 import com.example.hightrafficeventbookingsystem.model.Status;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ public class ReservationService {
     private final SeatRepository seatRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final ReservationEventProducer reservationEventProducer;
 
     @Transactional
     public Long reserveSeats(List<Long> seatIds, Long userId) {
@@ -87,6 +90,18 @@ public class ReservationService {
         ticket.setRequestedSeatIds(requestedSeatIds);
         ticket.setTotalPrice(total);
         ticketRepository.save(ticket);
+
+        // Publish seat state changes to Kafka; WebSocket fan-out is handled by Kafka
+        // consumers.
+        Instant now = Instant.now();
+        final Ticket savedTicket = ticket;
+        seats.forEach(seat -> {
+            ReservationEvent eventUpdate = new ReservationEvent(
+                    savedTicket.getId(), userId, seat.getId(),
+                    event.getId(), event.getName(),
+                    ReservationEvent.ReservationAction.RESERVED, now);
+            reservationEventProducer.publish(eventUpdate);
+        });
 
         log.info("[Checkout] Pending ticket {} prepared for user {} — {} seat(s), awaiting Pay Now", ticket.getId(),
                 userId, seats.size());

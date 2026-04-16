@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/api/events",
                                 "/api/events/**",
+                                "/ws/**",          // SockJS handshake + WebSocket upgrade
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**"

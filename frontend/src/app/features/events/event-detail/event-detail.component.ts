@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -38,6 +38,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   private readonly stompService = inject(StompService);
   private readonly authService = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ngZone = inject(NgZone);
 
   protected readonly seats = signal<SeatResponse[]>([]);
   protected readonly event = signal<EventResponse | null>(null);
@@ -102,13 +103,17 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       .watchEvent(this.eventId)
       .pipe(takeUntil(this.destroy$))
       .subscribe(update => {
-        this.seats.update(current =>
-          current.map(s =>
-            s.id === update.seatId
-              ? { ...s, reserved: update.action !== 'CANCELLED' }
-              : s
-          )
-        );
+        // SockJS callbacks fire outside Angular's zone — NgZone.run() ensures
+        // the signal update triggers change detection immediately.
+        this.ngZone.run(() => {
+          this.seats.update(current =>
+            current.map(s =>
+              s.id === update.seatId
+                ? { ...s, reserved: update.action !== 'CANCELLED' }
+                : s
+            )
+          );
+        });
       });
   }
 }

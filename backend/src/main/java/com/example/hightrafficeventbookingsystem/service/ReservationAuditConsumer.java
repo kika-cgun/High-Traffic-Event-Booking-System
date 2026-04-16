@@ -17,30 +17,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationAuditConsumer {
 
-    private final AuditLogRepository auditLogRepository;
-    private final SeatWebSocketService seatWebSocketService;
+        private final AuditLogRepository auditLogRepository;
 
-    @KafkaListener(
-            topics = KafkaConfig.RESERVATION_EVENTS_TOPIC,
-            groupId = KafkaConfig.AUDIT_CONSUMER_GROUP,
-            containerFactory = "kafkaListenerContainerFactory"
-    )
-    public void consumeReservationEvent(
-            @Payload ReservationEvent event,
-            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-            @Header(KafkaHeaders.OFFSET) long offset
-    ) {
-        log.info("[Kafka AUDIT] ticketId={} | userId={} | action={} | event='{}' | partition={} | offset={} | timestamp={}",
-                event.ticketId(),
-                event.userId(),
-                event.action(),
-                event.eventName(),
-                partition,
-                offset,
-                event.timestamp()
-        );
+        @KafkaListener(topics = KafkaConfig.RESERVATION_EVENTS_TOPIC, groupId = KafkaConfig.AUDIT_CONSUMER_GROUP, containerFactory = "kafkaListenerContainerFactory")
+        public void consumeReservationEvent(
+                        @Payload ReservationEvent event,
+                        @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+                        @Header(KafkaHeaders.OFFSET) long offset) {
+                log.info("[Kafka AUDIT] ticketId={} | userId={} | action={} | event='{}' | partition={} | offset={} | timestamp={}",
+                                event.ticketId(),
+                                event.userId(),
+                                event.action(),
+                                event.eventName(),
+                                partition,
+                                offset,
+                                event.timestamp());
 
-        auditLogRepository.save(new AuditLog(event));
-        seatWebSocketService.broadcastSeatUpdate(event);
-    }
+                auditLogRepository.save(new AuditLog(event));
+        }
 }

@@ -1,5 +1,6 @@
 package com.example.hightrafficeventbookingsystem.service;
 
+import com.example.hightrafficeventbookingsystem.dto.ReservationEvent;
 import com.example.hightrafficeventbookingsystem.model.Seat;
 import com.example.hightrafficeventbookingsystem.model.Status;
 import com.example.hightrafficeventbookingsystem.model.Ticket;
@@ -12,7 +13,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -25,6 +29,7 @@ public class ReservationCleanupService {
     private final TicketRepository ticketRepository;
     private final SeatRepository seatRepository;
     private final RedisLockService redisLockService;
+    private final ReservationEventProducer reservationEventProducer;
 
     @Scheduled(fixedRate = 60000) // Runs every 60 seconds
     @Transactional
@@ -47,16 +52,43 @@ public class ReservationCleanupService {
         for (Ticket ticket : expiredTickets) {
             ticket.setStatus(Status.CANCELLED);
 
-            for (Seat seat : ticket.getSeats()) {
+            Instant now = Instant.now();
+
+            // For RESERVED (pending) tickets, seats are stored only in requestedSeatIds (String),
+            // NOT linked via FK — so ticket.getSeats() is empty. Load them explicitly.
+            // For CONFIRMED tickets (edge case), the FK collection is populated instead.
+            List<Seat> seats = ticket.getSeats().isEmpty()
+                    ? loadSeatsByRequestedIds(ticket.getRequestedSeatIds())
+                    : ticket.getSeats();
+
+            for (Seat seat : seats) {
                 seat.setReserved(false);
                 seatRepository.save(seat);
 
                 redisLockService.releaseLock(seat.getId());
+
+                // Broadcast CANCELLED via Kafka → WebSocket so other clients' UIs update in real time
+                reservationEventProducer.publish(new ReservationEvent(
+                        ticket.getId(), ticket.getUser().getId(), seat.getId(),
+                        seat.getEvent().getId(), seat.getEvent().getName(),
+                        ReservationEvent.ReservationAction.CANCELLED, now));
 
                 log.info("Cancelled ticket ID {} and released seat ID {}", ticket.getId(), seat.getId());
             }
         }
 
         ticketRepository.saveAll(expiredTickets);
+    }
+
+    private List<Seat> loadSeatsByRequestedIds(String requestedSeatIds) {
+        if (requestedSeatIds == null || requestedSeatIds.isBlank()) {
+            return Collections.emptyList();
+        }
+        List<Long> ids = Arrays.stream(requestedSeatIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)
+                .toList();
+        return seatRepository.findAllByIdWithEvent(ids);
     }
 }

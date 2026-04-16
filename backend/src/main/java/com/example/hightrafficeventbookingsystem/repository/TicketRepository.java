@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-    @Query("SELECT t FROM Ticket t WHERE t.status = :status AND t.createdAt < :cutoffDateTime")
+    @Query("SELECT t FROM Ticket t JOIN FETCH t.user WHERE t.status = :status AND t.createdAt < :cutoffDateTime")
     List<Ticket> findExpired(Status status, LocalDateTime cutoffDateTime, PageRequest pageable);
 
     @Query("SELECT DISTINCT t FROM Ticket t LEFT JOIN FETCH t.seats s LEFT JOIN FETCH s.event WHERE t.user.id = :userId ORDER BY t.createdAt DESC")

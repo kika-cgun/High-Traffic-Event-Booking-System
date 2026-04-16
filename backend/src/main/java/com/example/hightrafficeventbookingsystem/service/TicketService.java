@@ -140,9 +140,10 @@ public class TicketService {
     private void publishForSeats(Ticket ticket, List<Seat> seats, ReservationEvent.ReservationAction action) {
         Instant now = Instant.now();
         for (Seat seat : seats) {
-            reservationEventProducer.publish(new ReservationEvent(
+            ReservationEvent event = new ReservationEvent(
                     ticket.getId(), ticket.getUser().getId(), seat.getId(),
-                    seat.getEvent().getId(), seat.getEvent().getName(), action, now));
+                    seat.getEvent().getId(), seat.getEvent().getName(), action, now);
+            reservationEventProducer.publish(event);
         }
     }
 
