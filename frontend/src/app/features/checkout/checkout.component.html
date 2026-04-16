@@ -11,38 +11,37 @@
 
       @case ('ready') {
         <div class="checkout-content">
-          <h1>Confirm your booking</h1>
+          <h1>Potwierdź rezerwację</h1>
 
           <div class="ticket-summary">
             <div class="summary-row">
-              <span class="label">Event</span>
+              <span class="label">Wydarzenie</span>
               <span class="value">{{ ticket()!.eventName }}</span>
             </div>
             <mat-divider />
-            <div class="summary-row">
-              <span class="label">Section</span>
-              <span class="value">{{ ticket()!.seats[0]?.section }}</span>
+            
+            <div class="summary-row seats-list-row">
+              <span class="label">Wybrane miejsca ({{ ticket()!.seats.length }})</span>
+              <ul class="seats-list">
+                @for (seat of ticket()!.seats; track seat.id) {
+                  <li>
+                    Sekcja {{ seat.section }}, Rząd {{ seat.rowNumber }}, Miejsce {{ seat.seatNumber }}
+                    <span class="seat-price">{{ seat.price }} PLN</span>
+                  </li>
+                }
+              </ul>
             </div>
             <mat-divider />
-            <div class="summary-row">
-              <span class="label">Row</span>
-              <span class="value">{{ ticket()!.seats[0]?.rowNumber }}</span>
-            </div>
-            <mat-divider />
-            <div class="summary-row">
-              <span class="label">Seat</span>
-              <span class="value">{{ ticket()!.seats[0]?.seatNumber }}</span>
-            </div>
-            <mat-divider />
+            
             <div class="summary-row price-row">
-              <span class="label">Total</span>
+              <span class="label">Łącznie</span>
               <span class="price">{{ ticket()!.totalPrice }} PLN</span>
             </div>
           </div>
 
           <button mat-raised-button color="primary" class="pay-btn" (click)="pay()">
             <mat-icon>credit_card</mat-icon>
-            Pay now — {{ ticket()!.totalPrice }} PLN
+            Zapłać — {{ ticket()!.totalPrice }} PLN
           </button>
         </div>
       }
@@ -50,21 +49,21 @@
       @case ('paying') {
         <div class="center">
           <mat-spinner diameter="48" />
-          <p class="paying-text">Processing payment…</p>
+          <p class="paying-text">Przetwarzanie płatności…</p>
         </div>
       }
 
       @case ('success') {
         <div class="success-screen">
           <mat-icon class="success-icon">check_circle</mat-icon>
-          <h2>Booking confirmed!</h2>
-          <p>Your ticket #{{ ticketId }} has been confirmed.</p>
+          <h2>Rezerwacja potwierdzona!</h2>
+          <p>Twoje zamówienie nr {{ ticketId }} zostało pomyślnie zrealizowane.</p>
           <div class="success-actions">
             <a mat-raised-button color="primary" routerLink="/tickets">
               <mat-icon>confirmation_number</mat-icon>
-              View my tickets
+              Przejdź do moich biletów
             </a>
-            <a mat-button routerLink="/events">Browse more events</a>
+            <a mat-button routerLink="/events">Przeglądaj inne wydarzenia</a>
           </div>
         </div>
       }
@@ -72,8 +71,8 @@
       @case ('error') {
         <div class="center error-screen">
           <mat-icon class="error-icon">error_outline</mat-icon>
-          <p>Something went wrong. Please try again.</p>
-          <a mat-button routerLink="/events">Back to events</a>
+          <p>Coś poszło nie tak. Spróbuj ponownie.</p>
+          <a mat-button routerLink="/events">Wróć do wydarzeń</a>
         </div>
       }
 

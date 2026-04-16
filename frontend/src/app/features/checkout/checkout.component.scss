@@ -54,6 +54,40 @@
     color: #1a1a2e;
   }
 
+  &.seats-list-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 0.5rem;
+
+    .label {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .seats-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    li {
+      display: flex;
+      justify-content: space-between;
+      color: #1a1a2e;
+      padding: 0.4rem 0;
+      font-size: 0.95rem;
+      border-bottom: 1px dashed rgba(26, 26, 46, 0.05);
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .seat-price {
+        font-weight: 500;
+        color: rgba(26, 26, 46, 0.7);
+      }
+    }
+  }
+
   &.price-row {
     background: rgba(94, 53, 177, 0.04);
 
