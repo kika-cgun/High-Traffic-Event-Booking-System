@@ -1,24 +1,71 @@
 @if (view() === 'map') {
-  <div class="arena-map-wrapper">
-    <div class="stage-label">SCENA</div>
+  <div class="arena-svg-wrapper">
+    <svg viewBox="0 0 800 620" class="arena-svg" xmlns="http://www.w3.org/2000/svg">
+      
+      <!-- STAGE -->
+      <g class="stage-group">
+        <path d="M250,50 L550,50 L520,130 L280,130 Z" class="stage-path" />
+        <text x="400" y="95" class="stage-text">SCENA</text>
+      </g>
 
-    <button class="zone-btn pit-zone"
-      [class.sold-out]="pitSeats().length === 0"
-      (click)="selectPit()">
-      <span class="zone-name">PIT</span>
-      <span class="zone-info">{{ pitSeats().length }} wolnych</span>
-    </button>
+      <!-- PIT -->
+      <g class="zone-group" 
+         [class.sold-out]="pitSeats().length === 0"
+         (click)="selectPit()">
+        <path d="M 510.0 160.0 A 110 110 0 0 1 290.0 160.0 L 400 160 Z" class="zone-path pit-path" />
+        <text x="400.0" y="205.0" class="zone-title">PIT</text>
+        <text x="400.0" y="225.0" class="zone-subtitle">{{ pitSeats().length }} wolnych</text>
+      </g>
 
-    <div class="zones-grid">
-      @for (section of nonPitSections(); track section) {
-        <button class="zone-btn"
-          [class.sold-out]="sectionAvailability()[section]?.available === 0"
-          (click)="selectSection(section)">
-          <span class="zone-name">{{ section }}</span>
-          <span class="zone-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
-        </button>
-      }
-    </div>
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Parter R']?.available === 0 || !sectionAvailability()['Parter R']"
+         (click)="selectSection('Parter R')">
+        <path d="M 610.0 160.0 A 210 210 0 0 1 400.0 370.0 L 400.0 280.0 A 120 120 0 0 0 520.0 160.0 Z" class="zone-path zone-parter-r" />
+        <text x="516.7" y="266.7" class="zone-title">Parter R</text>
+        <text x="516.7" y="286.7" class="zone-subtitle">{{ sectionAvailability()['Parter R']?.available ?? 0 }} wolnych</text>
+      </g>
+
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Parter L']?.available === 0 || !sectionAvailability()['Parter L']"
+         (click)="selectSection('Parter L')">
+        <path d="M 400.0 370.0 A 210 210 0 0 1 190.0 160.0 L 280.0 160.0 A 120 120 0 0 0 400.0 280.0 Z" class="zone-path zone-parter-l" />
+        <text x="283.3" y="266.7" class="zone-title">Parter L</text>
+        <text x="283.3" y="286.7" class="zone-subtitle">{{ sectionAvailability()['Parter L']?.available ?? 0 }} wolnych</text>
+      </g>
+
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Balkon R']?.available === 0 || !sectionAvailability()['Balkon R']"
+         (click)="selectSection('Balkon R')">
+        <path d="M 710.0 160.0 A 310 310 0 0 1 619.2 379.2 L 555.6 315.6 A 220 220 0 0 0 620.0 160.0 Z" class="zone-path zone-balkon-r" />
+        <text x="644.8" y="251.4" class="zone-title">Balkon R</text>
+        <text x="644.8" y="271.4" class="zone-subtitle">{{ sectionAvailability()['Balkon R']?.available ?? 0 }} wolnych</text>
+      </g>
+
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Trybuna Główna']?.available === 0 || !sectionAvailability()['Trybuna Główna']"
+         (click)="selectSection('Trybuna Główna')">
+        <path d="M 619.2 379.2 A 310 310 0 0 1 180.8 379.2 L 244.4 315.6 A 220 220 0 0 0 555.6 315.6 Z" class="zone-path zone-trybuna-glowna" />
+        <text x="400.0" y="415.0" class="zone-title">Trybuna Główna</text>
+        <text x="400.0" y="435.0" class="zone-subtitle">{{ sectionAvailability()['Trybuna Główna']?.available ?? 0 }} wolnych</text>
+      </g>
+
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Balkon L']?.available === 0 || !sectionAvailability()['Balkon L']"
+         (click)="selectSection('Balkon L')">
+        <path d="M 180.8 379.2 A 310 310 0 0 1 90.0 160.0 L 180.0 160.0 A 220 220 0 0 0 244.4 315.6 Z" class="zone-path zone-balkon-l" />
+        <text x="155.2" y="251.4" class="zone-title">Balkon L</text>
+        <text x="155.2" y="271.4" class="zone-subtitle">{{ sectionAvailability()['Balkon L']?.available ?? 0 }} wolnych</text>
+      </g>
+
+      <g class="zone-group"
+         [class.sold-out]="sectionAvailability()['Górna Trybuna']?.available === 0 || !sectionAvailability()['Górna Trybuna']"
+         (click)="selectSection('Górna Trybuna')">
+        <path d="M 810.0 160.0 A 410 410 0 0 1 -10.0 160.0 L 80.0 160.0 A 320 320 0 0 0 720.0 160.0 Z" class="zone-path zone-gorna-trybuna" />
+        <text x="400.0" y="515.0" class="zone-title">Górna Trybuna</text>
+        <text x="400.0" y="535.0" class="zone-subtitle">{{ sectionAvailability()['Górna Trybuna']?.available ?? 0 }} wolnych</text>
+      </g>
+
+    </svg>
   </div>
 }
 
@@ -26,7 +73,7 @@
   <div class="section-view">
     <button mat-button (click)="back()">
       <mat-icon>arrow_back</mat-icon>
-      Powrot do mapy
+      Powrót do mapy
     </button>
     <app-pit-selector
       [maxSeats]="maxSeats()"
@@ -39,7 +86,7 @@
   <div class="section-view">
     <button mat-button (click)="back()">
       <mat-icon>arrow_back</mat-icon>
-      Powrot do mapy
+      Powrót do mapy
     </button>
     <h3 class="section-title">{{ selectedSection() }}</h3>
     <app-seat-grid

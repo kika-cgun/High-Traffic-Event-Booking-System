@@ -1,85 +1,202 @@
+// ─────────────────────────────────────────────
+// STADIUM WRAPPER
+// ─────────────────────────────────────────────
 .stadium-map-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem 2rem;
 }
 
-.map-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba(26, 26, 46, 0.45);
-  text-align: center;
+// ─────────────────────────────────────────────
+// STADIUM GRID — pitch in center, sectors around it
+//
+//  Layout:
+//   .      | N      | .
+//   W      | pitch  | E
+//   .      | S      | .
+//   [other sectors if any — spanning full width]
+// ─────────────────────────────────────────────
+.stadium-grid {
+  display: grid;
+  grid-template-columns: 120px auto 120px;
+  grid-template-rows: 70px auto 70px;
+  grid-template-areas:
+    ".    north  ."
+    "west pitch  east"
+    ".    south  .";
+  gap: 8px;
+  align-items: stretch;
+  justify-items: stretch;
 }
 
-.map-row {
+// ─────────────────────────────────────────────
+// PITCH CELL
+// ─────────────────────────────────────────────
+.pitch-cell {
+  grid-area: pitch;
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
-
-.side-label {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
+  justify-content: center;
 }
 
 .pitch-svg {
-  width: 280px;
-  height: 180px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.sectors-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
   width: 100%;
-  max-width: 400px;
-  margin-top: 1rem;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(82, 183, 136, 0.3),
+    0 6px 24px rgba(0, 0, 0, 0.2);
 }
 
+// ─────────────────────────────────────────────
+// SECTOR BUTTONS — base style
+// ─────────────────────────────────────────────
 .sector-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  justify-content: center;
+  padding: 0.6rem 0.8rem;
   background: rgba(26, 26, 46, 0.04);
-  border: 1px solid rgba(26, 26, 46, 0.12);
-  border-radius: 12px;
+  border: 1.5px solid rgba(26, 26, 46, 0.13);
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.18s ease, border-color 0.18s ease,
+              transform 0.15s ease, box-shadow 0.18s ease;
+  text-align: center;
 
   &:hover:not(.sold-out) {
-    background: rgba(26, 26, 46, 0.08);
-    border-color: rgba(26, 26, 46, 0.25);
-    transform: translateY(-2px);
+    background: rgba(26, 26, 46, 0.09);
+    border-color: rgba(26, 26, 46, 0.28);
+    box-shadow: 0 4px 14px rgba(26, 26, 46, 0.1);
   }
 
   &.sold-out {
-    opacity: 0.45;
+    opacity: 0.38;
     cursor: not-allowed;
   }
 }
 
+// ─────────────────────────────────────────────
+// DIRECTIONAL SECTOR PLACEMENT
+// ─────────────────────────────────────────────
+.sector--N {
+  grid-area: north;
+  border-radius: 10px 10px 4px 4px;
+
+  &:hover:not(.sold-out) { transform: translateY(-2px); }
+}
+
+.sector--S {
+  grid-area: south;
+  border-radius: 4px 4px 10px 10px;
+
+  &:hover:not(.sold-out) { transform: translateY(2px); }
+}
+
+.sector--W {
+  grid-area: west;
+  border-radius: 10px 4px 4px 10px;
+  flex-direction: column;
+
+  &:hover:not(.sold-out) { transform: translateX(-2px); }
+
+  .sector-name {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    letter-spacing: 0.06em;
+  }
+  .sector-info {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.65rem;
+  }
+}
+
+.sector--E {
+  grid-area: east;
+  border-radius: 4px 10px 10px 4px;
+
+  &:hover:not(.sold-out) { transform: translateX(2px); }
+
+  .sector-name {
+    writing-mode: vertical-rl;
+    letter-spacing: 0.06em;
+  }
+  .sector-info {
+    writing-mode: vertical-rl;
+    font-size: 0.65rem;
+  }
+}
+
+// Fallback sector (non-directional) appears below stadium grid
+.sector--other {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+// ─────────────────────────────────────────────
+// SECTOR COLORS — per direction
+// ─────────────────────────────────────────────
+.sector--N {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(99, 102, 241, 0.2);
+  &:hover:not(.sold-out) {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.38);
+  }
+}
+.sector--S {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
+  &:hover:not(.sold-out) {
+    background: rgba(16, 185, 129, 0.11);
+    border-color: rgba(16, 185, 129, 0.38);
+  }
+}
+.sector--W {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.2);
+  &:hover:not(.sold-out) {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.38);
+  }
+}
+.sector--E {
+  background: rgba(139, 92, 246, 0.05);
+  border-color: rgba(139, 92, 246, 0.2);
+  &:hover:not(.sold-out) {
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.38);
+  }
+}
+
+// ─────────────────────────────────────────────
+// SECTOR TEXT
+// ─────────────────────────────────────────────
 .sector-name {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #1a1a2e;
 }
 
 .sector-info {
-  font-size: 0.8rem;
-  color: rgba(26, 26, 46, 0.55);
-  margin-top: 0.25rem;
+  font-size: 0.73rem;
+  color: rgba(26, 26, 46, 0.5);
+  margin-top: 0.2rem;
 }
 
+// ─────────────────────────────────────────────
+// SECTION DETAIL VIEW
+// ─────────────────────────────────────────────
 .section-view {
   padding: 1rem;
+  width: 100%;
 
   .section-title {
     font-family: 'Syne', sans-serif;

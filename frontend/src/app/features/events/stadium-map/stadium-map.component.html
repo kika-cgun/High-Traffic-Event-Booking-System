@@ -2,7 +2,7 @@
   <div class="section-view">
     <button mat-button (click)="back()">
       <mat-icon>arrow_back</mat-icon>
-      Powrot do mapy
+      Powrót do mapy
     </button>
     <h3 class="section-title">Trybuna {{ selectedSection() }}</h3>
     <app-seat-grid
@@ -10,46 +10,122 @@
       [maxSeats]="maxSeats()"
       (seatsSelected)="onSeatsSelected($event)" />
   </div>
+
 } @else {
   <div class="stadium-map-wrapper">
-    <div class="map-label top-label">Trybuna N</div>
 
-    <div class="map-row">
-      <div class="map-label side-label">Trybuna W</div>
+    <!-- Stadium grid: sectors surrounding the pitch -->
+    <div class="stadium-grid">
 
-      <svg class="pitch-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- Pitch -->
-        <rect x="10" y="10" width="280" height="180" fill="#2d6a4f" rx="4"/>
-        <rect x="10" y="10" width="280" height="180" fill="none" stroke="#52b788" stroke-width="2" rx="4"/>
-        <!-- Center circle -->
-        <circle cx="150" cy="100" r="30" fill="none" stroke="#52b788" stroke-width="1.5"/>
-        <circle cx="150" cy="100" r="2" fill="#52b788"/>
-        <!-- Center line -->
-        <line x1="150" y1="10" x2="150" y2="190" stroke="#52b788" stroke-width="1.5"/>
-        <!-- Penalty boxes -->
-        <rect x="10" y="65" width="50" height="70" fill="none" stroke="#52b788" stroke-width="1.5"/>
-        <rect x="240" y="65" width="50" height="70" fill="none" stroke="#52b788" stroke-width="1.5"/>
-        <!-- Goal boxes -->
-        <rect x="10" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
-        <rect x="270" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
-      </svg>
-
-      <div class="map-label side-label">Trybuna E</div>
-    </div>
-
-    <div class="map-label bottom-label">Trybuna S</div>
-
-    <div class="sectors-grid">
+      <!-- TOP: Trybuna N -->
       @for (section of sections(); track section) {
-        <button class="sector-btn"
-          [class.sold-out]="sectionAvailability()[section]?.available === 0"
-          (click)="selectSection(section)">
-          <span class="sector-name">Trybuna {{ section }}</span>
-          <span class="sector-info">
-            {{ sectionAvailability()[section]?.available ?? 0 }} wolnych
-          </span>
-        </button>
+        @if (section === 'N') {
+          <button class="sector-btn sector--N"
+            [class.sold-out]="sectionAvailability()[section]?.available === 0"
+            (click)="selectSection(section)">
+            <span class="sector-name">Trybuna N</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+          </button>
+        }
       }
+
+      <!-- LEFT: Trybuna W -->
+      @for (section of sections(); track section) {
+        @if (section === 'W') {
+          <button class="sector-btn sector--W"
+            [class.sold-out]="sectionAvailability()[section]?.available === 0"
+            (click)="selectSection(section)">
+            <span class="sector-name">Trybuna W</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+          </button>
+        }
+      }
+
+      <!-- CENTER: football pitch SVG -->
+      <div class="pitch-cell">
+        <svg class="pitch-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grass -->
+          <rect x="0" y="0" width="300" height="200" fill="#2d6a4f" rx="6"/>
+          <!-- Outer line -->
+          <rect x="8" y="8" width="284" height="184" fill="none" stroke="#52b788" stroke-width="2" rx="2"/>
+          <!-- Center line -->
+          <line x1="150" y1="8" x2="150" y2="192" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Center circle -->
+          <circle cx="150" cy="100" r="30" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <circle cx="150" cy="100" r="2.5" fill="#52b788"/>
+          <!-- Left penalty box -->
+          <rect x="8" y="62" width="52" height="76" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Left goal box -->
+          <rect x="8" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Left goal -->
+          <rect x="2" y="86" width="6" height="28" fill="rgba(82,183,136,0.3)" stroke="#52b788" stroke-width="1"/>
+          <!-- Left penalty spot -->
+          <circle cx="42" cy="100" r="2" fill="#52b788"/>
+          <!-- Right penalty box -->
+          <rect x="240" y="62" width="52" height="76" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Right goal box -->
+          <rect x="272" y="80" width="20" height="40" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Right goal -->
+          <rect x="292" y="86" width="6" height="28" fill="rgba(82,183,136,0.3)" stroke="#52b788" stroke-width="1"/>
+          <!-- Right penalty spot -->
+          <circle cx="258" cy="100" r="2" fill="#52b788"/>
+          <!-- Kick-off arc (right, partial) -->
+          <path d="M 150 70 A 30 30 0 0 1 150 130" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Kick-off arc (left, partial) -->
+          <path d="M 150 70 A 30 30 0 0 0 150 130" fill="none" stroke="#52b788" stroke-width="1.5"/>
+          <!-- Corner arcs -->
+          <path d="M 8 14 A 8 8 0 0 1 14 8" fill="none" stroke="#52b788" stroke-width="1.2"/>
+          <path d="M 286 8 A 8 8 0 0 1 292 14" fill="none" stroke="#52b788" stroke-width="1.2"/>
+          <path d="M 8 186 A 8 8 0 0 0 14 192" fill="none" stroke="#52b788" stroke-width="1.2"/>
+          <path d="M 286 192 A 8 8 0 0 0 292 186" fill="none" stroke="#52b788" stroke-width="1.2"/>
+          <!-- Striped grass texture -->
+          <rect x="30"  y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="60"  y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="90"  y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="120" y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="180" y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="210" y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="240" y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+          <rect x="270" y="8" width="15" height="184" fill="rgba(255,255,255,0.025)"/>
+        </svg>
+      </div>
+
+      <!-- RIGHT: Trybuna E -->
+      @for (section of sections(); track section) {
+        @if (section === 'E') {
+          <button class="sector-btn sector--E"
+            [class.sold-out]="sectionAvailability()[section]?.available === 0"
+            (click)="selectSection(section)">
+            <span class="sector-name">Trybuna E</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+          </button>
+        }
+      }
+
+      <!-- BOTTOM: Trybuna S -->
+      @for (section of sections(); track section) {
+        @if (section === 'S') {
+          <button class="sector-btn sector--S"
+            [class.sold-out]="sectionAvailability()[section]?.available === 0"
+            (click)="selectSection(section)">
+            <span class="sector-name">Trybuna S</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+          </button>
+        }
+      }
+
+      <!-- FALLBACK: any other section names (B, C etc.) shown in a sub-grid below -->
+      @for (section of sections(); track section) {
+        @if (section !== 'N' && section !== 'S' && section !== 'E' && section !== 'W') {
+          <button class="sector-btn sector--other"
+            [class.sold-out]="sectionAvailability()[section]?.available === 0"
+            (click)="selectSection(section)">
+            <span class="sector-name">Trybuna {{ section }}</span>
+            <span class="sector-info">{{ sectionAvailability()[section]?.available ?? 0 }} wolnych</span>
+          </button>
+        }
+      }
+
     </div>
   </div>
 }

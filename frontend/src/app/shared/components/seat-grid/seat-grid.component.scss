@@ -1,100 +1,236 @@
+// ─────────────────────────────────────────────
+// WRAPPER
+// ─────────────────────────────────────────────
 .grid-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  padding: 1.5rem;
+  gap: 1.75rem;
+  padding: 1.5rem 1rem;
+}
+
+// ─────────────────────────────────────────────
+// STAGE / SCREEN
+// ─────────────────────────────────────────────
+.stage-wrap {
+  width: 58%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .stage {
-  width: 60%;
-  text-align: center;
-  padding: 0.5rem 2rem;
-  border: 2px solid rgba(26, 26, 46, 0.15);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: rgba(26, 26, 46, 0.4);
-  background: rgba(26, 26, 46, 0.03);
-}
-
-.section {
   width: 100%;
-}
-
-.section-label {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(26, 26, 46, 0.4);
-  margin: 0 0 0.75rem;
-}
-
-.seat-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.row-num {
+  text-align: center;
+  padding: 0.6rem 2rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: rgba(26, 26, 46, 0.35);
-  width: 1.5rem;
-  text-align: right;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: rgba(26, 26, 46, 0.45);
+  background: rgba(26, 26, 46, 0.04);
+  border: 2px solid rgba(26, 26, 46, 0.14);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  // Trapezoid — screen appears wider at edges like a real cinema
+  clip-path: polygon(2% 0%, 98% 0%, 100% 100%, 0% 100%);
+}
+
+// Soft "light spill" below the screen
+.stage-shadow {
+  width: 80%;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(26, 26, 46, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+// ─────────────────────────────────────────────
+// SECTIONS ROW (horizontal layout)
+// ─────────────────────────────────────────────
+.sections-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+// ─────────────────────────────────────────────
+// MAIN AISLE (between sections)
+// ─────────────────────────────────────────────
+.main-aisle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  min-width: 3.5rem;
+  align-self: stretch;
+  position: relative;
+  // push down past the section-badge
+  padding-top: 2rem;
+
+  // Dashed center line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(26, 26, 46, 0.13) 0px,
+      rgba(26, 26, 46, 0.13) 5px,
+      transparent 5px,
+      transparent 11px
+    );
+  }
+
+  .aisle-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: rgba(26, 26, 46, 0.22);
+    background: var(--color-surface, #f5f0e8);
+    padding: 0.5rem 0.15rem;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+  }
+}
+
+// ─────────────────────────────────────────────
+// SECTION
+// ─────────────────────────────────────────────
+.section {
   flex-shrink: 0;
 }
 
+// Section badge (like real venue maps)
+.section-badge {
+  display: inline-block;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 46, 0.5);
+  border: 1.5px solid rgba(26, 26, 46, 0.15);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+// ─────────────────────────────────────────────
+// SEAT ROW
+// ─────────────────────────────────────────────
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+// Row number — left & right
+.row-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: rgba(26, 26, 46, 0.3);
+  width: 1.4rem;
+  flex-shrink: 0;
+  text-align: right;
+  user-select: none;
+
+  &.row-num--right {
+    text-align: left;
+  }
+}
+
+// Inner aisle gap — splits each row in two halves (e.g. seats 1-5 | 6-10)
+.inner-gap {
+  width: 14px;
+  flex-shrink: 0;
+}
+
+// ─────────────────────────────────────────────
+// SEAT BUTTON
+// ─────────────────────────────────────────────
 .seat-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 6px 6px 4px 4px; // slightly flat bottom like a real seat
   border: none;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.2s ease;
+  transition: transform 0.12s ease, background-color 0.18s ease, box-shadow 0.18s ease;
   padding: 0;
+  position: relative;
+
+  // Subtle "seat back" line at top
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.12);
+  }
 
   &.available {
     background: #10b981;
     color: #fff;
+    box-shadow: 0 2px 0 #059669;
 
     &:hover:not(:disabled) {
       background: #059669;
-      transform: scale(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0 #047857;
     }
+
+    &::after { background: rgba(0, 0, 0, 0.1); }
   }
 
   &.reserved {
-    background: rgba(220, 53, 69, 0.15);
-    color: rgba(26, 26, 46, 0.35);
+    background: rgba(26, 26, 46, 0.07);
+    color: rgba(26, 26, 46, 0.25);
     cursor: not-allowed;
-    border: 1px solid rgba(220, 53, 69, 0.25);
+    border: 1px solid rgba(26, 26, 46, 0.1);
+    box-shadow: none;
+
+    &::after { background: rgba(26, 26, 46, 0.08); }
   }
 
   &.selected {
     background: #f59e0b;
     color: #1a1a2e;
     border: 2px solid #d97706;
+    box-shadow: 0 2px 0 #b45309;
 
     &:hover:not(:disabled) {
       background: #d97706;
-      transform: scale(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0 #92400e;
     }
+
+    &::after { background: rgba(0, 0, 0, 0.12); }
   }
 }
 
+// ─────────────────────────────────────────────
+// LEGEND
+// ─────────────────────────────────────────────
 .legend {
   display: flex;
   gap: 1.5rem;
-  font-size: 0.8rem;
-  color: rgba(26, 26, 46, 0.55);
+  font-size: 0.78rem;
+  color: rgba(26, 26, 46, 0.5);
 
   .legend-item {
     display: flex;
@@ -103,16 +239,31 @@
   }
 
   .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px 4px 3px 3px;
+    position: relative;
 
-    &.available { background: #10b981; }
-    &.selected { background: #f59e0b; border: 1px solid #d97706; }
-    &.reserved { background: rgba(220, 53, 69, 0.4); border: 1px solid rgba(220, 53, 69, 0.3); }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    &.available { background: #10b981; box-shadow: 0 2px 0 #059669; }
+    &.selected   { background: #f59e0b; box-shadow: 0 2px 0 #d97706; border: 1px solid #d97706; }
+    &.reserved   { background: rgba(26, 26, 46, 0.1); border: 1px solid rgba(26, 26, 46, 0.15); }
   }
 }
 
+// ─────────────────────────────────────────────
+// RESERVE BAR
+// ─────────────────────────────────────────────
 .reserve-bar {
   position: sticky;
   bottom: 0;

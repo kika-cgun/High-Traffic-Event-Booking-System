@@ -1,37 +1,68 @@
 <div class="grid-wrapper">
-  <div class="stage">STAGE / SCENA</div>
 
-  @for (sec of sections(); track sec.section) {
-    <div class="section">
-      <h3 class="section-label">Sekcja {{ sec.section }}</h3>
+  <!-- STAGE / SCREEN -->
+  <div class="stage-wrap">
+    <div class="stage">STAGE / SCENA</div>
+    <div class="stage-shadow"></div>
+  </div>
 
-      @for (row of sec.rows; track row.rowNumber) {
-        <div class="seat-row">
-          <span class="row-num">{{ row.rowNumber }}</span>
+  <!-- SEAT MAP -->
+  <div class="sections-row">
+    @for (sec of sections(); track sec.section; let i = $index) {
 
-          @for (seat of row.seats; track seat.id) {
-            <button
-              class="seat-btn"
-              [class.available]="!seat.reserved && !isSelected(seat)"
-              [class.selected]="isSelected(seat)"
-              [class.reserved]="seat.reserved"
-              [disabled]="seat.reserved"
-              [matTooltip]="seat.reserved ? 'Zarezerwowane' : (isSelected(seat) ? 'Kliknij aby odznaczic' : 'Rzad ' + seat.rowNumber + ', Miejsce ' + seat.seatNumber + ' — ' + seat.price + ' PLN')"
-              (click)="toggle(seat)">
-              {{ seat.seatNumber }}
-            </button>
-          }
+      @if (i > 0) {
+        <!-- Central corridor between sections -->
+        <div class="aisle main-aisle">
+          <span class="aisle-label">KORYTARZ</span>
         </div>
       }
-    </div>
-  }
 
+      <div class="section">
+        <div class="section-badge">Sekcja {{ sec.section }}</div>
+
+        @for (row of sec.rows; track row.rowNumber) {
+          <div class="seat-row">
+            <!-- Row number — left -->
+            <span class="row-num">{{ row.rowNumber }}</span>
+
+            <!-- Seats split into two halves with inner gap -->
+            @for (seat of row.seats; track seat.id; let si = $index) {
+              @if (si > 0 && si === (row.seats.length / 2)) {
+                <div class="inner-gap"></div>
+              }
+              <button
+                class="seat-btn"
+                [class.available]="!seat.reserved && !isSelected(seat)"
+                [class.selected]="isSelected(seat)"
+                [class.reserved]="seat.reserved"
+                [disabled]="seat.reserved"
+                [matTooltip]="seat.reserved
+                  ? 'Zarezerwowane'
+                  : (isSelected(seat)
+                    ? 'Kliknij aby odznaczić'
+                    : 'Rząd ' + seat.rowNumber + ', Miejsce ' + seat.seatNumber + ' — ' + seat.price + ' PLN')"
+                (click)="toggle(seat)">
+                {{ seat.seatNumber }}
+              </button>
+            }
+
+            <!-- Row number — right -->
+            <span class="row-num row-num--right">{{ row.rowNumber }}</span>
+          </div>
+        }
+      </div>
+
+    }
+  </div>
+
+  <!-- LEGEND -->
   <div class="legend">
     <span class="legend-item"><span class="dot available"></span> Wolne</span>
     <span class="legend-item"><span class="dot selected"></span> Wybrane</span>
     <span class="legend-item"><span class="dot reserved"></span> Zarezerwowane</span>
   </div>
 
+  <!-- RESERVE BAR -->
   @if (selectedCount() > 0) {
     <div class="reserve-bar">
       <button mat-flat-button color="primary" (click)="reserve()">
@@ -40,4 +71,5 @@
       </button>
     </div>
   }
+
 </div>
