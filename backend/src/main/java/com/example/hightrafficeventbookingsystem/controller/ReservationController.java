@@ -32,7 +32,7 @@ public class ReservationController {
                         @ApiResponse(responseCode = "400", description = "Invalid input — empty seatIds, seats belong to different events, or exceeds max seats per booking"),
                         @ApiResponse(responseCode = "401", description = "Unauthorized — JWT token missing or invalid"),
                         @ApiResponse(responseCode = "404", description = "One or more seats or the user not found"),
-                        @ApiResponse(responseCode = "409", description = "Already reserved — seat is taken or user already has an active ticket for this event"),
+                        @ApiResponse(responseCode = "409", description = "Already reserved — seat is taken"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
         @PostMapping

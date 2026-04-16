@@ -23,11 +23,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT DISTINCT t FROM Ticket t LEFT JOIN FETCH t.seats s LEFT JOIN FETCH s.event WHERE t.id = :id")
     Optional<Ticket> findByIdWithSeatsAndEvent(Long id);
 
-    @Query("SELECT CASE WHEN COUNT(DISTINCT t) > 0 THEN true ELSE false END " +
-            "FROM Ticket t LEFT JOIN t.seats s " +
-            "WHERE t.user.id = :userId AND t.status IN :statuses " +
-            "AND (t.eventId = :eventId OR s.event.id = :eventId)")
-    boolean existsActiveTicketForUserAndEvent(Long userId, Long eventId, List<Status> statuses);
-
     Optional<Ticket> findFirstByUserIdAndEventIdAndStatusOrderByCreatedAtDesc(Long userId, Long eventId, Status status);
 }

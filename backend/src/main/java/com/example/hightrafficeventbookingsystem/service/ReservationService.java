@@ -55,13 +55,6 @@ public class ReservationService {
                     "Cannot book more than " + event.getMaxSeatsPerBooking() + " seats for this event");
         }
 
-        // One finalized reservation per user per event
-        if (ticketRepository.existsActiveTicketForUserAndEvent(userId, event.getId(),
-                List.of(Status.CONFIRMED))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "You already have an active reservation for this event");
-        }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
